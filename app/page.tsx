@@ -1,65 +1,89 @@
-import Image from "next/image";
+"use client";
+
+import { MoveRight } from 'lucide-react';
+import TopNav from './components/TopNav';
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="relative min-h-screen w-full bg-white dark:bg-slate-800 font-sans overflow-hidden">
+      <TopNav />
+
+      {/* Hero Section */}
+      <div className="relative z-10 flex flex-col md:flex-row items-center justify-center min-h-screen w-full pt-16 px-4 sm:px-6 gap-12 max-w-7xl mx-auto">
+        {/* Left side: Heading, description, and CTAs */}
+        <div className="flex flex-col items-start justify-center w-full md:w-1/2 text-left animate-fade-in">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+            Build better financial workflows with LendTrack
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-lg">
+            LendTrack helps you manage personal and business loans with automated reminders, interest calculations, and comprehensive reporting.
+            Securely track your financial relationships in one place.
           </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 mb-10">
+            <a
+              className="flex h-12 w-44 items-center justify-center rounded-md bg-linear-to-r from-green-500 to-emerald-600 text-white font-medium transition-all hover:from-green-600 hover:to-emerald-700 hover:scale-105"
+              href="/signup"
+            >
+              Get started <MoveRight className="ml-2" />
+            </a>
+          </div>
+
+          {/* Feature highlights */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                <span className="text-white text-sm">✓</span>
+              </div>
+              <span className="text-gray-700 dark:text-gray-300">Automated payment reminders</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                <span className="text-white text-sm">✓</span>
+              </div>
+              <span className="text-gray-700 dark:text-gray-300">Secure financial tracking</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                <span className="text-white text-sm">✓</span>
+              </div>
+              <span className="text-gray-700 dark:text-gray-300">Comprehensive reporting</span>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Right side: Illustrations with subtle animations */}
+        <div className="relative w-full md:w-1/2 flex justify-center items-center">
+          <div className="relative w-full max-w-lg h-96">
+            {/* Main illustration container */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-64 h-64 rounded-2xl bg-linear-to-br from-blue-500/20 to-purple-500/20 dark:from-blue-600/20 dark:to-purple-600/20 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 flex items-center justify-center animate-float">
+                <div className="text-6xl">💰</div>
+              </div>
+            </div>
+
+            {/* Floating elements */}
+            <div className="absolute top-10 left-10 w-20 h-20 rounded-xl bg-linear-to-br from-green-400/30 to-emerald-500/30 dark:from-green-500/30 dark:to-emerald-600/30 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 flex items-center justify-center animate-float animation-delay-1000">
+              <div className="text-2xl">📊</div>
+            </div>
+
+            <div className="absolute bottom-10 right-10 w-24 h-24 rounded-xl bg-linear-to-br from-amber-400/30 to-orange-500/30 dark:from-amber-500/30 dark:to-orange-600/30 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 flex items-center justify-center animate-float animation-delay-2000">
+              <div className="text-3xl">🔔</div>
+            </div>
+
+            <div className="absolute top-1/2 right-0 w-16 h-16 rounded-lg bg-linear-to-br from-cyan-400/30 to-teal-500/30 dark:from-cyan-500/30 dark:to-teal-600/30 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 flex items-center justify-center animate-float animation-delay-500">
+              <div className="text-xl">🔒</div>
+            </div>
+          </div>
         </div>
-      </main>
+      </div>
+
+      {/* Enhanced GitHub-style background elements with gradients */}
+      {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-1/3 -left-1/4 w-200 h-200 bg-linear-to-br from-blue-500 to-purple-500/50 rounded-full blur-3xl opacity-30 animate-pulse-slow"></div>
+        <div className="absolute top-1/4 -right-1/4 w-150 h-150 bg-linear-to-br from-teal-500 to-green-500/70 rounded-full blur-3xl opacity-30 animate-pulse-slow animation-delay-2000"></div>
+      </div> */}
     </div>
   );
 }
