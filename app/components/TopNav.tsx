@@ -16,7 +16,7 @@ export default function TopNav() {
           width={32}
           height={32}
         />
-        <span className="ml-2 text-xl font-bold bg-clip-text text-slate-800 dark:text-white">LendTrack</span>
+        <span className="ml-2 text-xl font-bold bg-clip-text text-slate-800 dark:text-white hidden sm:block">LendTrack</span>
       </div>
 
       <div className="flex items-center gap-4">
