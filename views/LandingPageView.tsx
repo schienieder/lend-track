@@ -24,7 +24,7 @@ const LandingPageView = () => {
                     <div className="flex flex-col sm:flex-row gap-4 mb-10">
                         <a
                             className="flex h-12 w-44 items-center justify-center rounded-md bg-linear-to-r from-green-500 to-emerald-600 text-white font-medium transition-all hover:from-green-600 hover:to-emerald-700 hover:scale-105"
-                            href="/signup"
+                            href="/login"
                         >
                             Get started <MoveRight className="ml-2" />
                         </a>

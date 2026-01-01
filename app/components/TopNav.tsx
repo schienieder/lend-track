@@ -1,29 +1,61 @@
 'use client';
 
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState, useRef, useEffect } from 'react';
 
 export default function TopNav() {
   const { theme, toggleTheme } = useTheme();
+  const { user, signOut, loading } = useAuth();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      setDropdownOpen(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   return (
     <nav className="absolute top-0 left-0 right-0 z-50 py-4 px-6 flex justify-between items-center">
       <div className="flex items-center">
-        <Image
-          src="/images/lend-track-logo.png"
-          alt="LendTrack Logo"
-          width={32}
-          height={32}
-        />
-        <span className="ml-2 text-xl font-bold bg-clip-text text-slate-800 dark:text-white hidden sm:block">LendTrack</span>
+        <Link href={user ? '/dashboard' : '/'}>
+          <Image
+            src="/images/lend-track-logo.png"
+            alt="LendTrack Logo"
+            width={32}
+            height={32}
+          />
+        </Link>
+        <Link href={user ? '/dashboard' : '/'}>
+          <span className="ml-2 text-xl font-bold bg-clip-text text-slate-800 dark:text-white hidden sm:block">LendTrack</span>
+        </Link>
       </div>
 
       <div className="flex items-center gap-4">
         {/* Theme Toggle Button */}
         <button
           onClick={toggleTheme}
-          className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors cursor-pointer"
           aria-label="Toggle theme"
         >
           {theme === 'light' ? (
@@ -39,18 +71,62 @@ export default function TopNav() {
           )}
         </button>
 
-        <Link
-          href="/login"
-          className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium transition-colors"
-        >
-          Login
-        </Link>
-        <Link
-          href="/signup"
-          className="bg-slate-800 dark:bg-white text-white dark:text-slate-800 px-4 py-2 rounded-md font-medium transition-all hover:scale-105"
-        >
-          Register
-        </Link>
+        {user ? (
+          // User is logged in - show user dropdown
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium transition-colors focus:outline-none"
+              aria-expanded={dropdownOpen}
+              aria-haspopup="true"
+            >
+              <span className="hidden md:block">{user.name || user.email}</span>
+              <svg
+                className={`h-5 w-5 transform transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
+
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
+                <div className="py-1" role="none">
+                  <Link
+                    href="/dashboard"
+                    className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          // User is not logged in - show login/register buttons
+          <>
+            <Link
+              href="/login"
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium transition-colors"
+            >
+              Login
+            </Link>
+            <Link
+              href="/login?form-state=register"
+              className="bg-slate-800 dark:bg-white text-white dark:text-slate-800 px-4 py-2 rounded-md font-medium transition-all hover:scale-105"
+            >
+              Register
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );
