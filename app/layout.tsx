@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from './contexts/ThemeContext';
-import { AuthProvider } from './contexts/AuthContext';
+import "@/app/globals.css";
+import { ThemeProvider } from '@/app/contexts/ThemeContext';
+import { AuthProvider } from '@/app/contexts/AuthContext';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteTitle = "LendTrack";
-const siteDescription = "Welcome to LendTrack - LendTrack is a web application system that tracks lended amounts, due dates, interest rates, and other financial details. The application features secure user authentication, automated reminders, and comprehensive reporting tools to help manage personal and business loans efficiently.";
+const siteTitle = 'LendTrack';
+const siteDescription = 'Welcome to LendTrack - LendTrack is a web application system that tracks lended amounts, due dates, interest rates, and other financial details. The application features secure user authentication, automated reminders, and comprehensive reporting tools to help manage personal and business loans efficiently.';
 
 export const metadata: Metadata = {
   title: {
