@@ -1,12 +1,16 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit, Trash2, Calendar, DollarSign, Percent, Clock } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Calendar, DollarSign, Percent, Plus } from 'lucide-react';
 import LoanForm from '@/app/components/loans/LoanForm';
+import PaymentForm from '@/app/components/loans/PaymentForm';
+import PaymentHistory from '@/app/components/loans/PaymentHistory';
 import { fetchLoan, updateLoan, deleteLoan } from '@/connections/loan.api';
+import { fetchPayments, createPayment, updatePayment, deletePayment } from '@/connections/payment.api';
 import { LoanWithBalance, LoanStatus, CreateLoanData } from '@/schemas/loan';
+import { Payment, CreatePaymentData } from '@/schemas/payment';
 
 const statusColors: Record<LoanStatus, string> = {
   active: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
@@ -43,6 +47,25 @@ export default function LoanDetailsPage({ params }: { params: Promise<{ id: stri
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Payment state
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [totalPaid, setTotalPaid] = useState(0);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
+  const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
+  const [isDeletingPayment, setIsDeletingPayment] = useState<string | null>(null);
+
+  const loadPayments = useCallback(async () => {
+    try {
+      const response = await fetchPayments(id);
+      setPayments(response.payments);
+      setTotalPaid(response.total_paid);
+    } catch (err: any) {
+      console.error('Failed to load payments:', err);
+    }
+  }, [id]);
+
   useEffect(() => {
     const loadLoan = async () => {
       try {
@@ -58,7 +81,8 @@ export default function LoanDetailsPage({ params }: { params: Promise<{ id: stri
     };
 
     loadLoan();
-  }, [id]);
+    loadPayments();
+  }, [id, loadPayments]);
 
   const handleUpdate = async (data: CreateLoanData) => {
     setIsUpdating(true);
@@ -81,6 +105,70 @@ export default function LoanDetailsPage({ params }: { params: Promise<{ id: stri
       setError(err.message || 'Failed to delete loan');
       setIsDeleting(false);
     }
+  };
+
+  // Payment handlers
+  const handleCreatePayment = async (data: CreatePaymentData) => {
+    setIsPaymentLoading(true);
+    try {
+      await createPayment(id, data);
+      setShowPaymentModal(false);
+      // Refresh both loan and payments data
+      const [loanResponse] = await Promise.all([
+        fetchLoan(id),
+        loadPayments(),
+      ]);
+      setLoan(loanResponse.loan);
+    } finally {
+      setIsPaymentLoading(false);
+    }
+  };
+
+  const handleUpdatePayment = async (data: CreatePaymentData) => {
+    if (!editingPayment) return;
+    setIsPaymentLoading(true);
+    try {
+      await updatePayment(editingPayment.id, data);
+      setEditingPayment(null);
+      setShowPaymentModal(false);
+      // Refresh both loan and payments data
+      const [loanResponse] = await Promise.all([
+        fetchLoan(id),
+        loadPayments(),
+      ]);
+      setLoan(loanResponse.loan);
+    } finally {
+      setIsPaymentLoading(false);
+    }
+  };
+
+  const handleDeletePayment = async () => {
+    if (!paymentToDelete) return;
+    setIsDeletingPayment(paymentToDelete.id);
+    try {
+      await deletePayment(paymentToDelete.id);
+      setPaymentToDelete(null);
+      // Refresh both loan and payments data
+      const [loanResponse] = await Promise.all([
+        fetchLoan(id),
+        loadPayments(),
+      ]);
+      setLoan(loanResponse.loan);
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete payment');
+    } finally {
+      setIsDeletingPayment(null);
+    }
+  };
+
+  const openEditPaymentModal = (payment: Payment) => {
+    setEditingPayment(payment);
+    setShowPaymentModal(true);
+  };
+
+  const closePaymentModal = () => {
+    setShowPaymentModal(false);
+    setEditingPayment(null);
   };
 
   if (loading) {
@@ -294,25 +382,26 @@ export default function LoanDetailsPage({ params }: { params: Promise<{ id: stri
             </dl>
           </div>
 
-          {/* Payment History Placeholder */}
+          {/* Payment History */}
           <div className="px-6 py-5 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-medium text-gray-900 dark:text-white">Payment History</h2>
               <button
-                disabled
-                className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                onClick={() => setShowPaymentModal(true)}
+                className="inline-flex items-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700"
               >
-                <Clock className="h-4 w-4 mr-1" />
-                Record Payment (Coming Soon)
+                <Plus className="h-4 w-4 mr-1" />
+                Record Payment
               </button>
             </div>
-            {loan.total_paid === 0 ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">No payments recorded yet.</p>
-            ) : (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Total paid: {formatCurrency(loan.total_paid)}
-              </p>
-            )}
+            <PaymentHistory
+              payments={payments}
+              totalPaid={totalPaid}
+              principalWithInterest={loan.principal_amount + loan.total_interest}
+              onEdit={openEditPaymentModal}
+              onDelete={(payment) => setPaymentToDelete(payment)}
+              isDeleting={isDeletingPayment}
+            />
           </div>
         </div>
       </div>
@@ -338,6 +427,53 @@ export default function LoanDetailsPage({ params }: { params: Promise<{ id: stri
                 className="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50"
               >
                 {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+              {editingPayment ? 'Edit Payment' : 'Record Payment'}
+            </h3>
+            <PaymentForm
+              initialData={editingPayment || undefined}
+              remainingBalance={loan.remaining_amount}
+              onSubmit={editingPayment ? handleUpdatePayment : handleCreatePayment}
+              onCancel={closePaymentModal}
+              isLoading={isPaymentLoading}
+              submitLabel={editingPayment ? 'Update Payment' : 'Record Payment'}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Payment Delete Confirmation Modal */}
+      {paymentToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full mx-4">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Delete Payment</h3>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete this payment of {formatCurrency(Number(paymentToDelete.amount))}?
+              This will update the loan balance accordingly.
+            </p>
+            <div className="mt-4 flex justify-end gap-3">
+              <button
+                onClick={() => setPaymentToDelete(null)}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeletePayment}
+                disabled={!!isDeletingPayment}
+                className="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50"
+              >
+                {isDeletingPayment ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>
