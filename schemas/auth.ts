@@ -1,8 +1,17 @@
 import { z } from 'zod';
 
+// Email regex pattern (RFC 5322 compliant)
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+// Reusable email validation
+const emailSchema = z
+  .string()
+  .min(1, 'Email is required')
+  .regex(emailRegex, 'Please enter a valid email address');
+
 // Registration schema
 export const registerSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
+  email: emailSchema,
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters')
@@ -14,19 +23,19 @@ export const registerSchema = z.object({
 
 // Login schema
 export const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
+  email: emailSchema,
   password: z.string().min(1, 'Password is required'),
 });
 
 // Forgot password schema
 export const forgotPasswordSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
+  email: emailSchema,
 });
 
 // Reset password schema
 export const resetPasswordSchema = z.object({
   token: z.string().min(1, 'Token is required'),
-  email: z.string().email('Please enter a valid email address'),
+  email: emailSchema,
   newPassword: z
     .string()
     .min(8, 'Password must be at least 8 characters')
