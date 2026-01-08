@@ -14,7 +14,7 @@ const formatCurrency = (amount: number): string => {
 };
 
 const DashboardPageView = () => {
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const [loans, setLoans] = useState<Loan[]>([]);
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
@@ -25,6 +25,9 @@ const DashboardPageView = () => {
     });
 
     useEffect(() => {
+        // Wait for auth to be ready before fetching
+        if (authLoading) return;
+
         const loadLoans = async () => {
             try {
                 const response = await fetchLoans({ limit: 5 });
@@ -48,7 +51,7 @@ const DashboardPageView = () => {
         };
 
         loadLoans();
-    }, []);
+    }, [authLoading]);
 
     return (
         <div className="py-8 px-4 sm:px-6 lg:px-8">

@@ -14,6 +14,7 @@ import { useState } from 'react';
 interface LoanFormProps {
   initialData?: Partial<Loan>;
   onSubmit: (data: CreateLoanData) => Promise<void>;
+  onCancel?: () => void;
   isLoading?: boolean;
   submitLabel?: string;
 }
@@ -21,6 +22,7 @@ interface LoanFormProps {
 export default function LoanForm({
   initialData,
   onSubmit,
+  onCancel,
   isLoading = false,
   submitLabel = 'Create Loan',
 }: LoanFormProps) {
@@ -295,7 +297,7 @@ export default function LoanForm({
       <div className="flex justify-end gap-4">
         <button
           type="button"
-          onClick={() => window.history.back()}
+          onClick={onCancel ?? (() => window.history.back())}
           className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
         >
           Cancel
