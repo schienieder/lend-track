@@ -7,10 +7,13 @@ import { ArrowLeft, Edit, Trash2, Calendar, DollarSign, Percent, Plus } from 'lu
 import LoanForm from '@/app/components/loans/LoanForm';
 import PaymentForm from '@/app/components/loans/PaymentForm';
 import PaymentHistory from '@/app/components/loans/PaymentHistory';
+import Modal from '@/app/components/ui/Modal';
+import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { fetchLoan, updateLoan, deleteLoan } from '@/connections/loan.api';
 import { fetchPayments, createPayment, updatePayment, deletePayment } from '@/connections/payment.api';
 import { LoanWithBalance, LoanStatus, CreateLoanData } from '@/schemas/loan';
 import { Payment, CreatePaymentData } from '@/schemas/payment';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 const statusColors: Record<LoanStatus, string> = {
   active: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
@@ -39,6 +42,7 @@ export default function LoanDetailsPage({ params }: { params: Promise<{ id: stri
   const router = useRouter();
   const searchParams = useSearchParams();
   const isEditMode = searchParams.get('edit') === 'true';
+  const { loading: authLoading } = useAuth();
 
   const [loan, setLoan] = useState<LoanWithBalance | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,6 +71,9 @@ export default function LoanDetailsPage({ params }: { params: Promise<{ id: stri
   }, [id]);
 
   useEffect(() => {
+    // Wait for auth to be ready before fetching
+    if (authLoading) return;
+
     const loadLoan = async () => {
       try {
         setLoading(true);
@@ -82,7 +89,7 @@ export default function LoanDetailsPage({ params }: { params: Promise<{ id: stri
 
     loadLoan();
     loadPayments();
-  }, [id, loadPayments]);
+  }, [id, loadPayments, authLoading]);
 
   const handleUpdate = async (data: CreateLoanData) => {
     setIsUpdating(true);
@@ -407,78 +414,52 @@ export default function LoanDetailsPage({ params }: { params: Promise<{ id: stri
       </div>
 
       {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full mx-4">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Delete Loan</h3>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              Are you sure you want to delete this loan? This action cannot be undone.
-            </p>
-            <div className="mt-4 flex justify-end gap-3">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50"
-              >
-                {isDeleting ? 'Deleting...' : 'Delete'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title="Delete Loan"
+        description="Are you sure you want to delete this loan? This action cannot be undone."
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={handleDelete}
+        isLoading={isDeleting}
+      />
 
       {/* Payment Modal */}
-      {showPaymentModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-              {editingPayment ? 'Edit Payment' : 'Record Payment'}
-            </h3>
-            <PaymentForm
-              initialData={editingPayment || undefined}
-              remainingBalance={loan.remaining_amount}
-              onSubmit={editingPayment ? handleUpdatePayment : handleCreatePayment}
-              onCancel={closePaymentModal}
-              isLoading={isPaymentLoading}
-              submitLabel={editingPayment ? 'Update Payment' : 'Record Payment'}
-            />
-          </div>
-        </div>
-      )}
+      <Modal
+        open={showPaymentModal}
+        onOpenChange={(open) => {
+          if (!open) closePaymentModal();
+        }}
+        title={editingPayment ? 'Edit Payment' : 'Record Payment'}
+      >
+        <PaymentForm
+          initialData={editingPayment || undefined}
+          remainingBalance={loan.remaining_amount}
+          onSubmit={editingPayment ? handleUpdatePayment : handleCreatePayment}
+          onCancel={closePaymentModal}
+          isLoading={isPaymentLoading}
+          submitLabel={editingPayment ? 'Update Payment' : 'Record Payment'}
+        />
+      </Modal>
 
       {/* Payment Delete Confirmation Modal */}
-      {paymentToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full mx-4">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Delete Payment</h3>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              Are you sure you want to delete this payment of {formatCurrency(Number(paymentToDelete.amount))}?
-              This will update the loan balance accordingly.
-            </p>
-            <div className="mt-4 flex justify-end gap-3">
-              <button
-                onClick={() => setPaymentToDelete(null)}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeletePayment}
-                disabled={!!isDeletingPayment}
-                className="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50"
-              >
-                {isDeletingPayment ? 'Deleting...' : 'Delete'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        open={!!paymentToDelete}
+        onOpenChange={(open) => {
+          if (!open) setPaymentToDelete(null);
+        }}
+        title="Delete Payment"
+        description={
+          paymentToDelete
+            ? `Are you sure you want to delete this payment of ${formatCurrency(Number(paymentToDelete.amount))}? This will update the loan balance accordingly.`
+            : ''
+        }
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={handleDeletePayment}
+        isLoading={!!isDeletingPayment}
+      />
     </div>
   );
 }

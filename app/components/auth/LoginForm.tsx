@@ -20,7 +20,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { updateUser } = useAuth();
+  const { signIn } = useAuth();
 
   const {
     register,
@@ -35,31 +35,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
     setError(null);
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Login failed');
-      }
-
-      // Update the auth context with the user data from the API response
-      if (result.user) {
-        updateUser({
-          id: result.user.id,
-          email: result.user.email,
-          name: result.user.name
-        });
-      }
+      // Use Supabase client directly via AuthContext
+      // This ensures the session is stored in the browser
+      await signIn(data.email, data.password);
 
       // Call the success callback
       if (onLoginSuccess) {

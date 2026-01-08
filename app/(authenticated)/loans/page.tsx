@@ -4,10 +4,13 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Plus, Search, Filter } from 'lucide-react';
 import LoanTable from '@/app/components/loans/LoanTable';
+import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { fetchLoans, deleteLoan } from '@/connections/loan.api';
 import { Loan, LoanStatus, loanStatusOptions } from '@/schemas/loan';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 export default function LoansPage() {
+  const { loading: authLoading } = useAuth();
   const [loans, setLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,8 +45,10 @@ export default function LoansPage() {
   }, [searchTerm, statusFilter, pagination.page, pagination.limit]);
 
   useEffect(() => {
+    // Wait for auth to be ready before fetching
+    if (authLoading) return;
     loadLoans();
-  }, [loadLoans]);
+  }, [loadLoans, authLoading]);
 
   const handleDelete = async (id: string) => {
     setShowDeleteConfirm(id);
@@ -182,31 +187,18 @@ export default function LoansPage() {
       </div>
 
       {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full mx-4">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Delete Loan</h3>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              Are you sure you want to delete this loan? This action cannot be undone.
-            </p>
-            <div className="mt-4 flex justify-end gap-3">
-              <button
-                onClick={() => setShowDeleteConfirm(null)}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDelete}
-                disabled={isDeleting !== null}
-                className="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50"
-              >
-                {isDeleting ? 'Deleting...' : 'Delete'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        open={!!showDeleteConfirm}
+        onOpenChange={(open) => {
+          if (!open) setShowDeleteConfirm(null);
+        }}
+        title="Delete Loan"
+        description="Are you sure you want to delete this loan? This action cannot be undone."
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={confirmDelete}
+        isLoading={isDeleting !== null}
+      />
     </div>
   );
 }

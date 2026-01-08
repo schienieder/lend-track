@@ -1,4 +1,5 @@
 import { CreatePaymentData, UpdatePaymentData, Payment } from '@/schemas/payment';
+import { supabase } from '@/lib/supabase';
 
 const API_BASE = '/api';
 
@@ -17,30 +18,9 @@ interface MutationResponse {
 }
 
 // Helper to get auth headers
-const getAuthHeaders = (): HeadersInit => {
-  const session = localStorage.getItem('supabase.auth.token');
-  let token = '';
-
-  if (session) {
-    try {
-      const parsed = JSON.parse(session);
-      token = parsed?.currentSession?.access_token || '';
-    } catch {
-      // Try alternative storage key pattern
-    }
-  }
-
-  // Fallback: try to get from supabase storage
-  const keys = Object.keys(localStorage);
-  const supabaseKey = keys.find(key => key.startsWith('sb-') && key.endsWith('-auth-token'));
-  if (supabaseKey && !token) {
-    try {
-      const data = JSON.parse(localStorage.getItem(supabaseKey) || '');
-      token = data?.access_token || '';
-    } catch {
-      // Ignore parsing errors
-    }
-  }
+const getAuthHeaders = async (): Promise<HeadersInit> => {
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token || '';
 
   return {
     'Content-Type': 'application/json',
@@ -52,7 +32,7 @@ const getAuthHeaders = (): HeadersInit => {
 export async function fetchPayments(loanId: string): Promise<PaymentsResponse> {
   const response = await fetch(`${API_BASE}/loans/${loanId}/payments`, {
     method: 'GET',
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -67,7 +47,7 @@ export async function fetchPayments(loanId: string): Promise<PaymentsResponse> {
 export async function fetchPayment(id: string): Promise<SinglePaymentResponse> {
   const response = await fetch(`${API_BASE}/payments/${id}`, {
     method: 'GET',
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -82,7 +62,7 @@ export async function fetchPayment(id: string): Promise<SinglePaymentResponse> {
 export async function createPayment(loanId: string, data: CreatePaymentData): Promise<MutationResponse> {
   const response = await fetch(`${API_BASE}/loans/${loanId}/payments`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
     body: JSON.stringify(data),
   });
 
@@ -98,7 +78,7 @@ export async function createPayment(loanId: string, data: CreatePaymentData): Pr
 export async function updatePayment(id: string, data: UpdatePaymentData): Promise<MutationResponse> {
   const response = await fetch(`${API_BASE}/payments/${id}`, {
     method: 'PUT',
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
     body: JSON.stringify(data),
   });
 
@@ -114,7 +94,7 @@ export async function updatePayment(id: string, data: UpdatePaymentData): Promis
 export async function deletePayment(id: string): Promise<MutationResponse> {
   const response = await fetch(`${API_BASE}/payments/${id}`, {
     method: 'DELETE',
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
   });
 
   if (!response.ok) {

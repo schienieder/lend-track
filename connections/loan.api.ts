@@ -1,4 +1,5 @@
 import { CreateLoanData, UpdateLoanData, Loan, LoanWithBalance, LoanQueryParams } from '@/schemas/loan';
+import { supabase } from '@/lib/supabase';
 
 const API_BASE = '/api/loans';
 
@@ -22,30 +23,9 @@ interface MutationResponse {
 }
 
 // Helper to get auth headers
-const getAuthHeaders = (): HeadersInit => {
-  const session = localStorage.getItem('supabase.auth.token');
-  let token = '';
-
-  if (session) {
-    try {
-      const parsed = JSON.parse(session);
-      token = parsed?.currentSession?.access_token || '';
-    } catch {
-      // Try alternative storage key pattern
-    }
-  }
-
-  // Fallback: try to get from supabase storage
-  const keys = Object.keys(localStorage);
-  const supabaseKey = keys.find(key => key.startsWith('sb-') && key.endsWith('-auth-token'));
-  if (supabaseKey && !token) {
-    try {
-      const data = JSON.parse(localStorage.getItem(supabaseKey) || '');
-      token = data?.access_token || '';
-    } catch {
-      // Ignore parsing errors
-    }
-  }
+const getAuthHeaders = async (): Promise<HeadersInit> => {
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token || '';
 
   return {
     'Content-Type': 'application/json',
@@ -68,7 +48,7 @@ export async function fetchLoans(params?: LoanQueryParams): Promise<PaginatedRes
 
   const response = await fetch(url, {
     method: 'GET',
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -83,7 +63,7 @@ export async function fetchLoans(params?: LoanQueryParams): Promise<PaginatedRes
 export async function fetchLoan(id: string): Promise<SingleLoanResponse> {
   const response = await fetch(`${API_BASE}/${id}`, {
     method: 'GET',
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -98,7 +78,7 @@ export async function fetchLoan(id: string): Promise<SingleLoanResponse> {
 export async function createLoan(data: CreateLoanData): Promise<MutationResponse> {
   const response = await fetch(API_BASE, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
     body: JSON.stringify(data),
   });
 
@@ -114,7 +94,7 @@ export async function createLoan(data: CreateLoanData): Promise<MutationResponse
 export async function updateLoan(id: string, data: UpdateLoanData): Promise<MutationResponse> {
   const response = await fetch(`${API_BASE}/${id}`, {
     method: 'PUT',
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
     body: JSON.stringify(data),
   });
 
@@ -130,7 +110,7 @@ export async function updateLoan(id: string, data: UpdateLoanData): Promise<Muta
 export async function deleteLoan(id: string): Promise<MutationResponse> {
   const response = await fetch(`${API_BASE}/${id}`, {
     method: 'DELETE',
-    headers: getAuthHeaders(),
+    headers: await getAuthHeaders(),
   });
 
   if (!response.ok) {
