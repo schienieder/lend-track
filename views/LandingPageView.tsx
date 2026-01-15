@@ -1,88 +1,91 @@
 "use client";
 
 import TopNav from '@/app/components/TopNav'
-import { MoveRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { ArrowRight, Check } from 'lucide-react'
+import Link from 'next/link'
 
 const LandingPageView = () => {
     return (
-        <div className="relative min-h-screen w-full bg-white dark:bg-slate-800 font-sans overflow-hidden">
+        <div className="relative min-h-screen w-full bg-background font-sans overflow-hidden">
             <TopNav />
 
             {/* Hero Section */}
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-center min-h-screen w-full pt-16 px-4 sm:px-6 gap-12 max-w-7xl mx-auto">
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-center min-h-screen w-full pt-16 px-4 sm:px-6 gap-16 max-w-6xl mx-auto">
                 {/* Left side: Heading, description, and CTAs */}
-                <div className="flex flex-col items-start justify-center w-full md:w-1/2 text-left animate-fade-in">
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-800 dark:text-white mb-6 leading-tight">
-                        Build better financial workflows with LendTrack
+                <div className="flex flex-col items-start justify-center w-full md:w-1/2 text-left">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground mb-6 leading-[1.1] tracking-tight">
+                        Simplify your
+                        <span className="text-primary"> lending </span>
+                        workflow
                     </h1>
 
-                    <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-lg">
-                        LendTrack helps you manage personal and business loans with automated reminders, interest calculations, and comprehensive reporting.
-                        Securely track your financial relationships in one place.
+                    <p className="text-lg text-muted-foreground mb-8 max-w-md leading-relaxed">
+                        Track loans, automate reminders, and manage your financial relationships with ease. All in one secure platform.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row gap-4 mb-10">
-                        <a
-                            className="flex h-12 w-44 items-center justify-center rounded-md bg-linear-to-r from-green-500 to-emerald-600 text-white font-medium transition-all hover:from-green-600 hover:to-emerald-700 hover:scale-105"
-                            href="/login"
-                        >
-                            Get started <MoveRight className="ml-2" />
-                        </a>
+                    <div className="flex flex-col sm:flex-row gap-3 mb-12">
+                        <Button size="lg" asChild>
+                            <Link href="/login">
+                                Get started
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                            </Link>
+                        </Button>
+                        <Button variant="outline" size="lg" asChild>
+                            <Link href="/login?form-state=register">
+                                Create account
+                            </Link>
+                        </Button>
                     </div>
 
                     {/* Feature highlights */}
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
-                                <span className="text-white text-sm">✓</span>
+                            <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                                <Check className="h-3 w-3 text-primary" />
                             </div>
-                            <span className="text-gray-700 dark:text-gray-300">Automated payment reminders</span>
+                            <span className="text-sm text-muted-foreground">Automated payment reminders</span>
                         </div>
                         <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
-                                <span className="text-white text-sm">✓</span>
+                            <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                                <Check className="h-3 w-3 text-primary" />
                             </div>
-                            <span className="text-gray-700 dark:text-gray-300">Secure financial tracking</span>
+                            <span className="text-sm text-muted-foreground">Secure financial tracking</span>
                         </div>
                         <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
-                                <span className="text-white text-sm">✓</span>
+                            <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                                <Check className="h-3 w-3 text-primary" />
                             </div>
-                            <span className="text-gray-700 dark:text-gray-300">Comprehensive reporting</span>
+                            <span className="text-sm text-muted-foreground">Comprehensive reporting</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Right side: Illustrations with subtle animations - Hidden on mobile */}
+                {/* Right side: Minimal abstract illustration */}
                 <div className="relative w-full md:w-1/2 hidden md:flex justify-center items-center">
-                    <div className="relative w-full max-w-lg h-96">
-                        {/* Main illustration container */}
+                    <div className="relative w-full max-w-sm h-80">
+                        {/* Main card */}
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-64 h-64 rounded-2xl bg-linear-to-br from-blue-500/20 to-purple-500/20 dark:from-blue-600/20 dark:to-purple-600/20 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 flex items-center justify-center animate-float">
-                                <div className="text-6xl">💰</div>
+                            <div className="w-56 h-56 rounded-3xl bg-gradient-to-br from-primary/5 to-primary/10 border border-border flex items-center justify-center shadow-sm">
+                                <div className="w-40 h-40 rounded-2xl bg-card border border-border shadow-sm flex flex-col items-center justify-center gap-3">
+                                    <div className="w-20 h-2 bg-muted rounded-full" />
+                                    <div className="w-16 h-2 bg-muted rounded-full" />
+                                    <div className="w-12 h-6 bg-primary/20 rounded-md mt-2" />
+                                </div>
                             </div>
                         </div>
 
-                        {/* Floating elements with enhanced animations */}
-                        <div
-                            className="absolute top-10 left-10 w-20 h-20 rounded-xl bg-linear-to-br from-green-400/30 to-emerald-500/30 dark:from-green-500/30 dark:to-emerald-600/30 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 flex items-center justify-center animate-float animation-delay-1000"
-                            style={{ animation: 'float 6s ease-in-out infinite' }}
-                        >
-                            <div className="text-2xl">📊</div>
+                        {/* Floating accent elements */}
+                        <div className="absolute top-4 left-4 w-12 h-12 rounded-xl bg-primary/10 border border-border flex items-center justify-center animate-pulse">
+                            <div className="w-6 h-6 rounded-md bg-primary/20" />
                         </div>
 
-                        <div
-                            className="absolute bottom-10 right-10 w-24 h-24 rounded-xl bg-linear-to-br from-amber-400/30 to-orange-500/30 dark:from-amber-500/30 dark:to-orange-600/30 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 flex items-center justify-center animate-float animation-delay-2000"
-                            style={{ animation: 'float 8s ease-in-out infinite 1s' }}
-                        >
-                            <div className="text-3xl">🔔</div>
+                        <div className="absolute bottom-8 right-4 w-14 h-14 rounded-xl bg-muted border border-border flex items-center justify-center">
+                            <div className="w-8 h-1.5 bg-primary/30 rounded-full" />
                         </div>
 
-                        <div
-                            className="absolute top-1/2 right-0 w-16 h-16 rounded-lg bg-linear-to-br from-cyan-400/30 to-teal-500/30 dark:from-cyan-500/30 dark:to-teal-600/30 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 flex items-center justify-center animate-float animation-delay-500"
-                            style={{ animation: 'float 7s ease-in-out infinite 0.5s' }}
-                        >
-                            <div className="text-xl">🔒</div>
+                        <div className="absolute top-1/3 right-0 w-10 h-10 rounded-lg bg-card border border-border shadow-sm flex items-center justify-center">
+                            <div className="w-4 h-4 rounded-full bg-primary/30" />
                         </div>
                     </div>
                 </div>

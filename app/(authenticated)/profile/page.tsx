@@ -2,59 +2,47 @@
 
 import React from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
-import Image from 'next/image';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { User } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
 
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-slate-800 rounded-lg shadow-md mx-auto">
-        <div className="text-center">
-          <div className="flex justify-center mb-6">
-            <Image
-              src="/images/lend-track-logo.png"
-              alt="LendTrack Logo"
-              width={48}
-              height={48}
-            />
-          </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-800 dark:text-white">
-            Your Profile
-          </h2>
-        </div>
-
-        <div className="mt-8 space-y-6">
-          <div className="space-y-4">
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                User ID
-              </label>
-              <div className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-slate-700 text-gray-900 dark:text-white">
-                {user?.id}
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Email
-              </label>
-              <div className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-slate-700 text-gray-900 dark:text-white">
-                {user?.email}
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Name
-              </label>
-              <div className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-slate-700 text-gray-900 dark:text-white">
-                {user?.name || 'Not provided'}
-              </div>
+      <Card className="max-w-md mx-auto">
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <div className="rounded-full bg-primary/10 p-4">
+              <User className="h-8 w-8 text-primary" />
             </div>
           </div>
-        </div>
-      </div>
+          <CardTitle className="text-2xl">Your Profile</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>User ID</Label>
+            <div className="rounded-md border bg-muted/50 px-3 py-2 text-sm text-foreground">
+              {user?.id}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Email</Label>
+            <div className="rounded-md border bg-muted/50 px-3 py-2 text-sm text-foreground">
+              {user?.email}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Name</Label>
+            <div className="rounded-md border bg-muted/50 px-3 py-2 text-sm text-foreground">
+              {user?.name || 'Not provided'}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

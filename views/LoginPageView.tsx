@@ -21,26 +21,26 @@ const LoginPageView = () => {
         } else {
             setIsLoginView(true);
         }
-    }, [])
+    }, [queryParams])
 
     useEffect(() => {
         if (user) {
             router.push('/dashboard');
         }
-    }, [user]);
+    }, [user, router]);
 
     return (
-        <div className="relative min-h-screen w-full bg-slate-100 dark:bg-slate-900 font-sans overflow-hidden">
-            <Link href="/" className="top-5 left-5 absolute flex items-center justify-center">
+        <div className="relative min-h-screen w-full bg-background font-sans overflow-hidden">
+            <Link href="/" className="top-6 left-6 absolute flex items-center gap-2">
                 <Image
                     src="/images/lend-track-logo.png"
                     alt="LendTrack Logo"
                     width={32}
                     height={32}
                 />
-                <h4 className="text-xl text-gray-700 dark:text-white font-bold ml-2">LendTrack</h4>
+                <span className="text-xl font-bold text-foreground">LendTrack</span>
             </Link>
-            <div className="flex items-center justify-center min-h-screen">
+            <div className="flex items-center justify-center min-h-screen px-4">
                 {isLoginView ? (
                     <LoginForm
                         onLoginSuccess={() => {
@@ -51,7 +51,6 @@ const LoginPageView = () => {
                 ) : (
                     <RegisterForm
                         onRegisterSuccess={() => {
-                            // After successful registration, switch to login view
                             setIsLoginView(true);
                         }}
                         onSwitchToLogin={() => setIsLoginView(true)}
