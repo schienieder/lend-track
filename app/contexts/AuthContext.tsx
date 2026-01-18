@@ -30,44 +30,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check active session on initial load
-    const checkSession = async () => {
+    // Check active session on initial load using getUser() for server validation
+    const checkUser = async () => {
       const {
-        data: { session },
-      } = await supabase.auth.getSession();
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
 
-      if (session?.user) {
+      if (authUser) {
         setUser({
-          id: session.user.id,
-          email: String(session.user.email),
-          name: session.user.user_metadata?.name || null,
+          id: authUser.id,
+          email: String(authUser.email),
+          name: authUser.user_metadata?.name || null,
         });
       }
 
       setLoading(false);
-
-      // Set up real-time authentication listener
-      const { data: { subscription } } = await supabase.auth.onAuthStateChange(
-        (_event, session) => {
-          if (session?.user) {
-            setUser({
-              id: session.user.id,
-              email: String(session.user.email),
-              name: session.user.user_metadata?.name || null,
-            });
-          } else {
-            setUser(null);
-          }
-          setLoading(false);
-        }
-      );
-
-      return () => {
-        subscription.unsubscribe();
-      };
     };
 
-    checkSession();
+    checkUser();
+
+    // Set up real-time authentication listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (session?.user) {
+          setUser({
+            id: session.user.id,
+            email: String(session.user.email),
+            name: session.user.user_metadata?.name || null,
+          });
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {

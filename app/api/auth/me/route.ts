@@ -1,48 +1,53 @@
-import { NextRequest } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    // Get current session
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const cookieStore = await cookies();
 
-    if (!session) {
-      return new Response(
-        JSON.stringify({ error: 'No active session' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          },
+        },
+      }
+    );
 
-    // Get user info from session
+    // Get user info using getUser() which validates against the server
     const {
       data: { user },
       error: userError
-    } = await supabase.auth.getUser(session.access_token);
+    } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      return new Response(
-        JSON.stringify({ error: userError?.message || 'Could not retrieve user' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      return NextResponse.json(
+        { error: userError?.message || 'No active session' },
+        { status: 401 }
       );
     }
 
     // Return user data
-    return new Response(
-      JSON.stringify({
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.user_metadata?.name || null
-        }
-      }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
+    return NextResponse.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.user_metadata?.name || null
+      }
+    });
   } catch (error: any) {
-    return new Response(
-      JSON.stringify({ error: 'Failed to get user info', details: error.message }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    return NextResponse.json(
+      { error: 'Failed to get user info', details: error.message },
+      { status: 500 }
     );
   }
 }

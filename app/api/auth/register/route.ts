@@ -1,5 +1,6 @@
-import { NextRequest } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { registerSchema } from '@/schemas/auth';
 
 export async function POST(request: NextRequest) {
@@ -9,6 +10,25 @@ export async function POST(request: NextRequest) {
 
     const { email, password, name } = validatedData;
 
+    const cookieStore = await cookies();
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          },
+        },
+      }
+    );
+
     // Check if user already exists
     const { data: existingUser, error: checkError } = await supabase
       .from('users')
@@ -17,9 +37,9 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingUser && !checkError) {
-      return new Response(
-        JSON.stringify({ error: 'User with this email already exists' }),
-        { status: 409, headers: { 'Content-Type': 'application/json' } }
+      return NextResponse.json(
+        { error: 'User with this email already exists' },
+        { status: 409 }
       );
     }
 
@@ -36,31 +56,28 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      return new Response(
-        JSON.stringify({ error: error.message }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     // If registration is successful, return success response
-    return new Response(
-      JSON.stringify({
+    return NextResponse.json(
+      {
         message: 'Registration successful. Please check your email for verification.',
         user: { id: data.user?.id, email: data.user?.email }
-      }),
-      { status: 201, headers: { 'Content-Type': 'application/json' } }
+      },
+      { status: 201 }
     );
   } catch (error: any) {
     if (error.name === 'ZodError') {
-      return new Response(
-        JSON.stringify({ error: 'Validation failed', details: error.errors }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      return NextResponse.json(
+        { error: 'Validation failed', details: error.errors },
+        { status: 400 }
       );
     }
 
-    return new Response(
-      JSON.stringify({ error: 'Registration failed', details: error.message }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    return NextResponse.json(
+      { error: 'Registration failed', details: error.message },
+      { status: 500 }
     );
   }
 }

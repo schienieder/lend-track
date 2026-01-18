@@ -1,27 +1,41 @@
-import { NextRequest } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
+    const cookieStore = await cookies();
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          },
+        },
+      }
+    );
+
     // Sign out the user with Supabase Auth
     const { error } = await supabase.auth.signOut();
 
     if (error) {
-      return new Response(
-        JSON.stringify({ error: error.message }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     // Return success response
-    return new Response(
-      JSON.stringify({ message: 'Logout successful' }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
+    return NextResponse.json({ message: 'Logout successful' });
   } catch (error: any) {
-    return new Response(
-      JSON.stringify({ error: 'Logout failed', details: error.message }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    return NextResponse.json(
+      { error: 'Logout failed', details: error.message },
+      { status: 500 }
     );
   }
 }
