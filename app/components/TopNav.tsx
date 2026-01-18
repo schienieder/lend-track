@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Moon, Sun, ChevronDown, LayoutDashboard, LogOut } from 'lucide-react';
+import { Moon, Sun, ChevronDown, LayoutDashboard, LogOut, Wallet } from 'lucide-react';
 
 export default function TopNav() {
   const { theme, toggleTheme } = useTheme();
@@ -64,6 +64,12 @@ export default function TopNav() {
                 <Link href="/dashboard" className="flex items-center gap-2">
                   <LayoutDashboard className="h-4 w-4" />
                   Dashboard
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/loans" className="flex items-center gap-2">
+                  <Wallet className="h-4 w-4" />
+                  Loans
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2">

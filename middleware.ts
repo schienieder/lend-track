@@ -36,7 +36,8 @@ export async function middleware(request: NextRequest) {
 
   // Protect authenticated routes
   const isAuthRoute = request.nextUrl.pathname.startsWith('/dashboard') ||
-    request.nextUrl.pathname.startsWith('/profile');
+    request.nextUrl.pathname.startsWith('/profile') ||
+    request.nextUrl.pathname.startsWith('/loans');
 
   if (isAuthRoute && !user) {
     const url = request.nextUrl.clone();
