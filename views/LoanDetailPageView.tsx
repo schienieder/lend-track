@@ -7,6 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import LoanCard from '@/app/components/loans/LoanCard';
 import EditLoanDialog from '@/app/components/loans/EditLoanDialog';
 import DeleteLoanDialog from '@/app/components/loans/DeleteLoanDialog';
+import PaymentSection from '@/app/components/payments/PaymentSection';
 import type { Loan } from '@/types/loan';
 
 interface LoanDetailPageViewProps {
@@ -128,6 +129,11 @@ const LoanDetailPageView: React.FC<LoanDetailPageViewProps> = ({ loanId }) => {
           onEdit={() => setEditDialogOpen(true)}
           onDelete={() => setDeleteDialogOpen(true)}
         />
+
+        {/* Payment Section */}
+        <div className="mt-8">
+          <PaymentSection loan={loan} />
+        </div>
 
         {/* Dialogs */}
         <EditLoanDialog
