@@ -1,5 +1,5 @@
 // Reminder type enum
-export type ReminderType = 'due_date' | 'overdue' | 'custom';
+export type ReminderType = 'due_date' | 'overdue' | 'custom' | 'loan_created';
 
 // Reminder sent status enum
 export type ReminderSentStatus = 'pending' | 'sent' | 'failed';

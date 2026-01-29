@@ -3,6 +3,7 @@ import {
   getDueDateReminderTemplate,
   getOverdueReminderTemplate,
   getCustomReminderTemplate,
+  getLoanCreatedTemplate,
   type LoanReminderData,
 } from './templates';
 import type { ReminderType } from '@/types/reminder';
@@ -18,6 +19,7 @@ export interface SendReminderParams {
   daysUntilDue?: number;
   daysOverdue?: number;
   customMessage?: string;
+  paymentSchedule?: string;
 }
 
 export interface SendReminderResult {
@@ -38,6 +40,7 @@ export async function sendReminder(params: SendReminderParams): Promise<SendRemi
     daysUntilDue,
     daysOverdue,
     customMessage,
+    paymentSchedule,
   } = params;
 
   // Calculate total amount with interest
@@ -67,6 +70,9 @@ export async function sendReminder(params: SendReminderParams): Promise<SendRemi
       break;
     case 'custom':
       emailContent = getCustomReminderTemplate({ ...loanData, customMessage });
+      break;
+    case 'loan_created':
+      emailContent = getLoanCreatedTemplate({ ...loanData, paymentSchedule: paymentSchedule || 'monthly' });
       break;
     default:
       return {

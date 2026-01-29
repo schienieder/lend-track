@@ -284,6 +284,103 @@ LendTrack Team
   return { subject, html, text };
 }
 
+export function getLoanCreatedTemplate(data: LoanReminderData & { paymentSchedule: string }): { subject: string; html: string; text: string } {
+  const { borrowerName, lenderName, principalAmount, interestRate, totalAmount, dueDate, paymentSchedule } = data;
+
+  const subject = `Loan Created: Your loan details from ${lenderName}`;
+
+  const formatPaymentSchedule = (schedule: string): string => {
+    const scheduleMap: Record<string, string> = {
+      'daily': 'Daily',
+      'weekly': 'Weekly',
+      'bi-weekly': 'Bi-Weekly',
+      'monthly': 'Monthly',
+      'quarterly': 'Quarterly',
+      'yearly': 'Yearly',
+      'one-time': 'One-Time',
+    };
+    return scheduleMap[schedule] || schedule;
+  };
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      ${baseStyles}
+    </head>
+    <body>
+      <div class="header">
+        <h1>Loan Created</h1>
+      </div>
+      <div class="content">
+        <p>Dear ${borrowerName},</p>
+
+        <p>A new loan has been created for you by <strong>${lenderName}</strong>. Below are the details of your loan:</p>
+
+        <div class="loan-details">
+          <table>
+            <tr>
+              <td>Principal Amount</td>
+              <td>${formatCurrency(principalAmount)}</td>
+            </tr>
+            <tr>
+              <td>Interest Rate</td>
+              <td>${interestRate}%</td>
+            </tr>
+            <tr>
+              <td>Payment Schedule</td>
+              <td>${formatPaymentSchedule(paymentSchedule)}</td>
+            </tr>
+            <tr>
+              <td>Due Date</td>
+              <td>${formatDate(dueDate)}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="amount-due">
+          Total Amount Due: ${formatCurrency(totalAmount)}
+        </div>
+
+        <p>Please ensure your payment is made by the due date to avoid any late fees or penalties.</p>
+
+        <p>If you have any questions about this loan, please contact your lender directly.</p>
+
+        <p>Best regards,<br>LendTrack Team</p>
+      </div>
+      <div class="footer">
+        <p>This is an automated notification from <a href="#">LendTrack</a>.</p>
+        <p>If you have any questions, please contact your lender directly.</p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const text = `
+Loan Created
+
+Dear ${borrowerName},
+
+A new loan has been created for you by ${lenderName}. Below are the details of your loan:
+
+Loan Details:
+- Principal Amount: ${formatCurrency(principalAmount)}
+- Interest Rate: ${interestRate}%
+- Payment Schedule: ${formatPaymentSchedule(paymentSchedule)}
+- Due Date: ${formatDate(dueDate)}
+- Total Amount Due: ${formatCurrency(totalAmount)}
+
+Please ensure your payment is made by the due date to avoid any late fees or penalties.
+
+If you have any questions about this loan, please contact your lender directly.
+
+Best regards,
+LendTrack Team
+  `.trim();
+
+  return { subject, html, text };
+}
+
 export function getCustomReminderTemplate(data: LoanReminderData & { customMessage?: string }): { subject: string; html: string; text: string } {
   const { borrowerName, lenderName, principalAmount, interestRate, totalAmount, dueDate, customMessage } = data;
 
