@@ -1,3 +1,5 @@
+import { formatCurrency } from '@/lib/utils';
+
 export interface LoanReminderData {
   borrowerName: string;
   lenderName: string;
@@ -7,13 +9,6 @@ export interface LoanReminderData {
   dueDate: string;
   daysUntilDue?: number;
   daysOverdue?: number;
-}
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
 }
 
 function formatDate(dateString: string): string {

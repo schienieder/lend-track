@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/select';
 import { Bell, BellOff, ExternalLink } from 'lucide-react';
 import ReminderStatusBadge from '@/app/components/reminders/ReminderStatusBadge';
+import { formatCurrency } from '@/lib/utils';
 import type { ReminderWithLoan, ReminderSentStatus, ReminderType, ReminderQueryParams } from '@/types/reminder';
 
 const formatDate = (dateString: string) => {
@@ -31,17 +32,11 @@ const formatDate = (dateString: string) => {
   });
 };
 
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
-};
-
 const reminderTypeLabels: Record<ReminderType, string> = {
   due_date: 'Due Date',
   overdue: 'Overdue',
   custom: 'Custom',
+  loan_created: 'Loan Created',
 };
 
 const RemindersPageView = () => {

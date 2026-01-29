@@ -20,6 +20,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Eye, Pencil, Trash2 } from 'lucide-react';
 import LoanStatusBadge from '@/app/components/loans/LoanStatusBadge';
+import { formatCurrency } from '@/lib/utils';
 import type { LoanTableProps, PaymentSchedule } from '@/types/loan';
 
 const scheduleLabels: Record<PaymentSchedule, string> = {
@@ -30,13 +31,6 @@ const scheduleLabels: Record<PaymentSchedule, string> = {
   quarterly: 'Quarterly',
   yearly: 'Yearly',
   'one-time': 'One-Time',
-};
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
 };
 
 const formatDate = (dateString: string) => {

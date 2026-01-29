@@ -25,6 +25,7 @@ const reminderTypeLabels: Record<ReminderType, string> = {
   due_date: 'Due Date',
   overdue: 'Overdue',
   custom: 'Custom',
+  loan_created: 'Loan Created',
 };
 
 const DeleteReminderDialog: React.FC<DeleteReminderDialogProps> = ({

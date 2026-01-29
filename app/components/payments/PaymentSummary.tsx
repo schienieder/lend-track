@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { DollarSign, TrendingDown, Receipt } from 'lucide-react';
+import { Banknote, TrendingDown, Receipt } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 interface PaymentSummaryProps {
   totalPaid: number;
@@ -11,13 +12,6 @@ interface PaymentSummaryProps {
   principalAmount: number;
   interestRate: number;
 }
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
-};
 
 const PaymentSummary: React.FC<PaymentSummaryProps> = ({
   totalPaid,
@@ -38,7 +32,7 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
           <CardContent className="pt-6">
             <div className="flex items-center space-x-2">
               <div className="rounded-full bg-green-100 p-2 dark:bg-green-900">
-                <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <Banknote className="h-4 w-4 text-green-600 dark:text-green-400" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Paid</p>
