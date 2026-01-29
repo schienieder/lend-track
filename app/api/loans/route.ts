@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase-server';
 import { createLoanSchema, loanQuerySchema } from '@/schemas/loan';
 import { z } from 'zod';
+import { sendReminder } from '@/lib/email/send-reminder';
 
 // GET /api/loans - List loans with filters and pagination
 export async function GET(request: NextRequest) {
@@ -113,6 +114,24 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Send loan created email if status is active and borrower has email
+    if (loan.status === 'active' && loan.borrower_email) {
+      // Send email asynchronously (don't block the response)
+      sendReminder({
+        reminderType: 'loan_created',
+        borrowerEmail: loan.borrower_email,
+        borrowerName: loan.borrower_name,
+        lenderName: loan.lender_name,
+        principalAmount: loan.principal_amount,
+        interestRate: loan.interest_rate,
+        dueDate: loan.due_date,
+        currency: loan.currency,
+        paymentSchedule: loan.payment_schedule,
+      }).catch((err) => {
+        console.error('Failed to send loan created email:', err);
+      });
     }
 
     return NextResponse.json({ loan }, { status: 201 });

@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { DollarSign, TrendingDown, Receipt } from 'lucide-react';
+import { Banknote, TrendingDown, Receipt } from 'lucide-react';
+import { formatCurrency, type CurrencyCode } from '@/lib/utils';
 
 interface PaymentSummaryProps {
   totalPaid: number;
@@ -10,14 +11,8 @@ interface PaymentSummaryProps {
   paymentCount: number;
   principalAmount: number;
   interestRate: number;
+  currency: CurrencyCode;
 }
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
-};
 
 const PaymentSummary: React.FC<PaymentSummaryProps> = ({
   totalPaid,
@@ -25,6 +20,7 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
   paymentCount,
   principalAmount,
   interestRate,
+  currency,
 }) => {
   const totalWithInterest = principalAmount * (1 + interestRate / 100);
   const progressPercentage = totalWithInterest > 0
@@ -38,12 +34,12 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
           <CardContent className="pt-6">
             <div className="flex items-center space-x-2">
               <div className="rounded-full bg-green-100 p-2 dark:bg-green-900">
-                <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <Banknote className="h-4 w-4 text-green-600 dark:text-green-400" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Paid</p>
                 <p className="text-xl font-bold text-green-600 dark:text-green-400">
-                  {formatCurrency(totalPaid)}
+                  {formatCurrency(totalPaid, currency)}
                 </p>
               </div>
             </div>
@@ -59,7 +55,7 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
               <div>
                 <p className="text-sm text-muted-foreground">Remaining Balance</p>
                 <p className="text-xl font-bold text-orange-600 dark:text-orange-400">
-                  {formatCurrency(remainingBalance)}
+                  {formatCurrency(remainingBalance, currency)}
                 </p>
               </div>
             </div>
@@ -98,8 +94,8 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
               />
             </div>
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>{formatCurrency(totalPaid)} paid</span>
-              <span>{formatCurrency(totalWithInterest)} total (with interest)</span>
+              <span>{formatCurrency(totalPaid, currency)} paid</span>
+              <span>{formatCurrency(totalWithInterest, currency)} total (with interest)</span>
             </div>
           </div>
         </CardContent>

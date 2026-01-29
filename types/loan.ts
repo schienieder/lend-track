@@ -1,3 +1,5 @@
+import type { CurrencyCode } from '@/lib/utils';
+
 // Loan status enum
 export type LoanStatus = 'active' | 'paid' | 'overdue' | 'defaulted';
 
@@ -11,10 +13,12 @@ export interface Loan {
   borrower_name: string;
   borrower_email: string | null;
   borrower_phone: string | null;
+  lender_name: string;
   principal_amount: number;
   interest_rate: number;
   due_date: string;
   payment_schedule: PaymentSchedule;
+  currency: CurrencyCode;
   status: LoanStatus;
   notes: string | null;
   created_at: string;
@@ -26,10 +30,12 @@ export interface CreateLoanInput {
   borrower_name: string;
   borrower_email?: string | null;
   borrower_phone?: string | null;
+  lender_name: string;
   principal_amount: number;
   interest_rate: number;
   due_date: string;
   payment_schedule: PaymentSchedule;
+  currency?: CurrencyCode;
   status?: LoanStatus;
   notes?: string | null;
 }
@@ -39,10 +45,12 @@ export interface UpdateLoanInput {
   borrower_name?: string;
   borrower_email?: string | null;
   borrower_phone?: string | null;
+  lender_name?: string;
   principal_amount?: number;
   interest_rate?: number;
   due_date?: string;
   payment_schedule?: PaymentSchedule;
+  currency?: CurrencyCode;
   status?: LoanStatus;
   notes?: string | null;
 }

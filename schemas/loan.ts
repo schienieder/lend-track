@@ -1,8 +1,10 @@
 import { z } from 'zod';
+import { CURRENCY_CODES } from '@/lib/utils';
 
 // Status and schedule enums as Zod schemas
 export const loanStatusSchema = z.enum(['active', 'paid', 'overdue', 'defaulted']);
 export const paymentScheduleSchema = z.enum(['daily', 'weekly', 'bi-weekly', 'monthly', 'quarterly', 'yearly', 'one-time']);
+export const currencySchema = z.enum(CURRENCY_CODES);
 
 // Schema for creating a new loan
 export const createLoanSchema = z.object({
@@ -22,6 +24,10 @@ export const createLoanSchema = z.object({
     .nullable()
     .optional()
     .transform(val => val || null),
+  lender_name: z
+    .string()
+    .min(1, 'Lender name is required')
+    .max(255, 'Lender name must be less than 255 characters'),
   principal_amount: z
     .number()
     .positive('Principal amount must be greater than 0')
@@ -38,6 +44,7 @@ export const createLoanSchema = z.object({
       'Please enter a valid date'
     ),
   payment_schedule: paymentScheduleSchema,
+  currency: currencySchema.optional().default('PHP'),
   status: loanStatusSchema.optional().default('active'),
   notes: z
     .string()
@@ -64,6 +71,11 @@ export const updateLoanSchema = z.object({
     .max(20, 'Phone number must be less than 20 characters')
     .nullable()
     .optional(),
+  lender_name: z
+    .string()
+    .min(1, 'Lender name is required')
+    .max(255, 'Lender name must be less than 255 characters')
+    .optional(),
   principal_amount: z
     .number()
     .positive('Principal amount must be greater than 0')
@@ -82,6 +94,7 @@ export const updateLoanSchema = z.object({
     )
     .optional(),
   payment_schedule: paymentScheduleSchema.optional(),
+  currency: currencySchema.optional(),
   status: loanStatusSchema.optional(),
   notes: z
     .string()
@@ -117,6 +130,10 @@ export const loanFormSchema = z.object({
     .max(20, 'Phone number must be less than 20 characters')
     .optional()
     .or(z.literal('')),
+  lender_name: z
+    .string()
+    .min(1, 'Lender name is required')
+    .max(255, 'Lender name must be less than 255 characters'),
   principal_amount: z
     .number()
     .positive('Principal amount must be greater than 0')
@@ -129,6 +146,7 @@ export const loanFormSchema = z.object({
     .string()
     .min(1, 'Due date is required'),
   payment_schedule: paymentScheduleSchema,
+  currency: currencySchema,
   status: loanStatusSchema.optional(),
   notes: z
     .string()

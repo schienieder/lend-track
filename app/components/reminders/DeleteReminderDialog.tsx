@@ -11,16 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { formatCurrency, type CurrencyCode } from '@/lib/utils';
-import type { Payment } from '@/types/payment';
-
-interface DeletePaymentDialogProps {
-  payment: Payment | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
-  currency: CurrencyCode;
-}
+import type { DeleteReminderDialogProps, ReminderType } from '@/types/reminder';
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -30,31 +21,37 @@ const formatDate = (dateString: string) => {
   });
 };
 
-const DeletePaymentDialog: React.FC<DeletePaymentDialogProps> = ({
-  payment,
+const reminderTypeLabels: Record<ReminderType, string> = {
+  due_date: 'Due Date',
+  overdue: 'Overdue',
+  custom: 'Custom',
+  loan_created: 'Loan Created',
+};
+
+const DeleteReminderDialog: React.FC<DeleteReminderDialogProps> = ({
+  reminder,
   open,
   onOpenChange,
   onSuccess,
-  currency,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleDelete = async () => {
-    if (!payment) return;
+    if (!reminder) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`/api/loans/${payment.loan_id}/payments/${payment.id}`, {
+      const response = await fetch(`/api/loans/${reminder.loan_id}/reminders/${reminder.id}`, {
         method: 'DELETE',
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to delete payment');
+        throw new Error(result.error || 'Failed to delete reminder');
       }
 
       onOpenChange(false);
@@ -67,17 +64,18 @@ const DeletePaymentDialog: React.FC<DeletePaymentDialogProps> = ({
     }
   };
 
-  if (!payment) return null;
+  if (!reminder) return null;
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Payment</AlertDialogTitle>
+          <AlertDialogTitle>Delete Reminder</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete this payment of{' '}
-            <span className="font-semibold">{formatCurrency(payment.amount, currency)}</span> from{' '}
-            <span className="font-semibold">{formatDate(payment.payment_date)}</span>?
+            Are you sure you want to delete this{' '}
+            <span className="font-semibold">{reminderTypeLabels[reminder.reminder_type]}</span> reminder
+            scheduled for{' '}
+            <span className="font-semibold">{formatDate(reminder.reminder_date)}</span>?
             This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -103,4 +101,4 @@ const DeletePaymentDialog: React.FC<DeletePaymentDialogProps> = ({
   );
 };
 
-export default DeletePaymentDialog;
+export default DeleteReminderDialog;

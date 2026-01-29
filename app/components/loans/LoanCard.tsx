@@ -9,8 +9,9 @@ import {
   CardAction,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash2, Mail, Phone, Calendar, Percent, DollarSign, FileText, Clock } from 'lucide-react';
-import LoanStatusBadge from './LoanStatusBadge';
+import { Pencil, Trash2, Mail, Phone, Calendar, Percent, Banknote, FileText, Clock } from 'lucide-react';
+import LoanStatusBadge from '@/app/components/loans/LoanStatusBadge';
+import { formatCurrency } from '@/lib/utils';
 import type { LoanCardProps, PaymentSchedule } from '@/types/loan';
 
 const scheduleLabels: Record<PaymentSchedule, string> = {
@@ -21,13 +22,6 @@ const scheduleLabels: Record<PaymentSchedule, string> = {
   quarterly: 'Quarterly',
   yearly: 'Yearly',
   'one-time': 'One-Time',
-};
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
 };
 
 const formatDate = (dateString: string) => {
@@ -123,10 +117,10 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onEdit, onDelete }) => {
             </h3>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <Banknote className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <span className="text-sm text-muted-foreground">Principal: </span>
-                  <span className="text-sm font-medium">{formatCurrency(loan.principal_amount)}</span>
+                  <span className="text-sm font-medium">{formatCurrency(loan.principal_amount, loan.currency)}</span>
                 </div>
               </div>
               <div className="flex items-center gap-3">

@@ -15,7 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { CURRENCIES, type CurrencyCode } from '@/lib/utils';
 import type { Loan, PaymentSchedule, LoanStatus } from '@/types/loan';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 const paymentScheduleOptions = [
   { value: 'daily', label: 'Daily' },
@@ -26,6 +28,11 @@ const paymentScheduleOptions = [
   { value: 'yearly', label: 'Yearly' },
   { value: 'one-time', label: 'One-Time' },
 ];
+
+const currencyOptions = Object.entries(CURRENCIES).map(([code, config]) => ({
+  value: code,
+  label: `${config.symbol} ${code}`,
+}));
 
 const statusOptions = [
   { value: 'active', label: 'Active' },
@@ -42,6 +49,8 @@ interface LoanFormProps {
 
 const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
   const isEditing = !!loan;
+  const { user } = useAuth();
+  const defaultLenderName = user?.name || user?.email || '';
 
   const {
     register,
@@ -56,10 +65,12 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
           borrower_name: loan.borrower_name,
           borrower_email: loan.borrower_email || '',
           borrower_phone: loan.borrower_phone || '',
+          lender_name: loan.lender_name,
           principal_amount: loan.principal_amount,
           interest_rate: loan.interest_rate,
           due_date: loan.due_date.split('T')[0],
           payment_schedule: loan.payment_schedule,
+          currency: loan.currency || 'PHP',
           status: loan.status,
           notes: loan.notes || '',
         }
@@ -67,16 +78,19 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
           borrower_name: '',
           borrower_email: '',
           borrower_phone: '',
+          lender_name: defaultLenderName,
           principal_amount: 0,
           interest_rate: 0,
           due_date: '',
           payment_schedule: 'monthly',
+          currency: 'PHP',
           status: 'active',
           notes: '',
         },
   });
 
   const paymentSchedule = watch('payment_schedule');
+  const currency = watch('currency');
   const status = watch('status');
 
   const handleFormSubmit = async (data: LoanFormData) => {
@@ -123,6 +137,19 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
           />
           {errors.borrower_phone && (
             <p className="text-sm text-destructive">{errors.borrower_phone.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="lender_name">Lender Name *</Label>
+          <Input
+            id="lender_name"
+            placeholder="Enter lender name"
+            aria-invalid={!!errors.lender_name}
+            {...register('lender_name')}
+          />
+          {errors.lender_name && (
+            <p className="text-sm text-destructive">{errors.lender_name.message}</p>
           )}
         </div>
 
@@ -194,29 +221,49 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
           )}
         </div>
 
-        {isEditing && (
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
-            <Select
-              value={status}
-              onValueChange={(value) => setValue('status', value as LoanStatus)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                {statusOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.status && (
-              <p className="text-sm text-destructive">{errors.status.message}</p>
-            )}
-          </div>
-        )}
+        <div className="space-y-2">
+          <Label htmlFor="currency">Currency *</Label>
+          <Select
+            value={currency}
+            onValueChange={(value) => setValue('currency', value as CurrencyCode)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select currency" />
+            </SelectTrigger>
+            <SelectContent>
+              {currencyOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.currency && (
+            <p className="text-sm text-destructive">{errors.currency.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="status">Status</Label>
+          <Select
+            value={status}
+            onValueChange={(value) => setValue('status', value as LoanStatus)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.status && (
+            <p className="text-sm text-destructive">{errors.status.message}</p>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2">
