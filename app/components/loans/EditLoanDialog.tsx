@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import LoanForm from './LoanForm';
+import LoanForm from '@/app/components/loans/LoanForm';
 import type { LoanFormData } from '@/schemas/loan';
 import type { EditLoanDialogProps } from '@/types/loan';
 

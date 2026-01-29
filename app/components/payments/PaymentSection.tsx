@@ -4,11 +4,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
-import PaymentTable from './PaymentTable';
-import PaymentSummary from './PaymentSummary';
-import CreatePaymentDialog from './CreatePaymentDialog';
-import EditPaymentDialog from './EditPaymentDialog';
-import DeletePaymentDialog from './DeletePaymentDialog';
+import PaymentTable from '@/app/components/payments/PaymentTable';
+import PaymentSummary from '@/app/components/payments/PaymentSummary';
+import CreatePaymentDialog from '@/app/components/payments/CreatePaymentDialog';
+import EditPaymentDialog from '@/app/components/payments/EditPaymentDialog';
+import DeletePaymentDialog from '@/app/components/payments/DeletePaymentDialog';
 import type { Payment } from '@/types/payment';
 import type { Loan } from '@/types/loan';
 

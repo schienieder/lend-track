@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2, Mail, Phone, Calendar, Percent, DollarSign, FileText, Clock } from 'lucide-react';
-import LoanStatusBadge from './LoanStatusBadge';
+import LoanStatusBadge from '@/app/components/loans/LoanStatusBadge';
 import type { LoanCardProps, PaymentSchedule } from '@/types/loan';
 
 const scheduleLabels: Record<PaymentSchedule, string> = {

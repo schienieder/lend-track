@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Trash2, RefreshCw, Send, Loader2 } from 'lucide-react';
-import ReminderStatusBadge from './ReminderStatusBadge';
+import ReminderStatusBadge from '@/app/components/reminders/ReminderStatusBadge';
 import type { ReminderTableProps, ReminderType } from '@/types/reminder';
 
 const formatDate = (dateString: string) => {
@@ -43,6 +43,7 @@ const reminderTypeLabels: Record<ReminderType, string> = {
   due_date: 'Due Date',
   overdue: 'Overdue',
   custom: 'Custom',
+  loan_created: 'loan_created'
 };
 
 const ReminderTable: React.FC<ReminderTableProps> = ({
@@ -77,7 +78,7 @@ const ReminderTable: React.FC<ReminderTableProps> = ({
             <TableHead>Type</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="hidden sm:table-cell">Sent At</TableHead>
-            {(onDelete || onRetry) && <TableHead className="w-[70px]">Actions</TableHead>}
+            {(onDelete || onRetry) && <TableHead className="w-17.5">Actions</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>

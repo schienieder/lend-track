@@ -5,7 +5,7 @@ import {
   getCustomReminderTemplate,
   getLoanCreatedTemplate,
   type LoanReminderData,
-} from './templates';
+} from '@/lib/email/templates';
 import type { ReminderType } from '@/types/reminder';
 
 export interface SendReminderParams {

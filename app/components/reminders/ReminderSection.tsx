@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Settings, Bell, AlertCircle, Send } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import ReminderTable from './ReminderTable';
-import ReminderConfigDialog from './ReminderConfigDialog';
-import DeleteReminderDialog from './DeleteReminderDialog';
-import SendReminderDialog from './SendReminderDialog';
+import ReminderTable from '@/app/components/reminders/ReminderTable';
+import ReminderConfigDialog from '@/app/components/reminders/ReminderConfigDialog';
+import DeleteReminderDialog from '@/app/components/reminders/DeleteReminderDialog';
+import SendReminderDialog from '@/app/components/reminders/SendReminderDialog';
 import type { Reminder, ReminderSectionProps } from '@/types/reminder';
 
 const ReminderSection: React.FC<ReminderSectionProps> = ({ loanId, loanDueDate, borrowerEmail, borrowerName }) => {

@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import ReminderConfigForm from './ReminderConfigForm';
+import ReminderConfigForm from '@/app/components/reminders/ReminderConfigForm';
 import type { ReminderConfig, ReminderConfigDialogProps, UpdateReminderConfigInput } from '@/types/reminder';
 
 const ReminderConfigDialog: React.FC<ReminderConfigDialogProps> = ({

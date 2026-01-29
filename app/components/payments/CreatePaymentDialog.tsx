@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import PaymentForm from './PaymentForm';
+import PaymentForm from '@/app/components/payments/PaymentForm';
 import type { PaymentFormData } from '@/schemas/payment';
 import type { CreatePaymentDialogProps } from '@/types/payment';
 

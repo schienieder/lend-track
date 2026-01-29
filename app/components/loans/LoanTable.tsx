@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Eye, Pencil, Trash2 } from 'lucide-react';
-import LoanStatusBadge from './LoanStatusBadge';
+import LoanStatusBadge from '@/app/components/loans/LoanStatusBadge';
 import type { LoanTableProps, PaymentSchedule } from '@/types/loan';
 
 const scheduleLabels: Record<PaymentSchedule, string> = {
