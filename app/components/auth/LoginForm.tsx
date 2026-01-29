@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginData } from '@/schemas/auth';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -131,6 +130,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             )}
           </div>
 
+          {/* TODO: Implement remember me and forgot password functionality
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <input
@@ -151,6 +151,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
               Forgot password?
             </Link>
           </div>
+          */}
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign in'}
