@@ -19,6 +19,7 @@ interface LoanWithUser {
   user_id: string;
   borrower_name: string;
   borrower_email: string | null;
+  lender_name: string;
   principal_amount: number;
   interest_rate: number;
   currency: CurrencyCode;
@@ -190,6 +191,7 @@ export async function processReminders(): Promise<ProcessResult> {
           id,
           borrower_name,
           borrower_email,
+          lender_name,
           principal_amount,
           interest_rate,
           currency,
@@ -238,15 +240,6 @@ export async function processReminders(): Promise<ProcessResult> {
         continue;
       }
 
-      // Get lender name from user profile
-      const { data: user } = await supabase
-        .from('users')
-        .select('name, email')
-        .eq('id', loan.user_id)
-        .single();
-
-      const lenderName = user?.name || user?.email || 'Your Lender';
-
       // Calculate days until due or days overdue
       const days = daysUntil(loan.due_date);
       const daysUntilDue = days >= 0 ? days : undefined;
@@ -257,7 +250,7 @@ export async function processReminders(): Promise<ProcessResult> {
         reminderType: reminder.reminder_type,
         borrowerEmail: loan.borrower_email,
         borrowerName: loan.borrower_name,
-        lenderName,
+        lenderName: loan.lender_name,
         principalAmount: loan.principal_amount,
         interestRate: loan.interest_rate,
         dueDate: loan.due_date,

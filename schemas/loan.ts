@@ -24,6 +24,10 @@ export const createLoanSchema = z.object({
     .nullable()
     .optional()
     .transform(val => val || null),
+  lender_name: z
+    .string()
+    .min(1, 'Lender name is required')
+    .max(255, 'Lender name must be less than 255 characters'),
   principal_amount: z
     .number()
     .positive('Principal amount must be greater than 0')
@@ -66,6 +70,11 @@ export const updateLoanSchema = z.object({
     .string()
     .max(20, 'Phone number must be less than 20 characters')
     .nullable()
+    .optional(),
+  lender_name: z
+    .string()
+    .min(1, 'Lender name is required')
+    .max(255, 'Lender name must be less than 255 characters')
     .optional(),
   principal_amount: z
     .number()
@@ -121,6 +130,10 @@ export const loanFormSchema = z.object({
     .max(20, 'Phone number must be less than 20 characters')
     .optional()
     .or(z.literal('')),
+  lender_name: z
+    .string()
+    .min(1, 'Lender name is required')
+    .max(255, 'Lender name must be less than 255 characters'),
   principal_amount: z
     .number()
     .positive('Principal amount must be greater than 0')

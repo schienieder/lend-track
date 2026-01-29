@@ -21,7 +21,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Fetch the loan with user details
     const { data: loan, error: loanError } = await supabase
       .from('loans')
-      .select('id, borrower_name, borrower_email, principal_amount, interest_rate, currency, due_date, status, user_id')
+      .select('id, borrower_name, borrower_email, lender_name, principal_amount, interest_rate, currency, due_date, status, user_id')
       .eq('id', loanId)
       .eq('user_id', user.id)
       .single();
@@ -37,15 +37,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         { status: 400 }
       );
     }
-
-    // Get lender name from user profile
-    const { data: userProfile } = await supabase
-      .from('users')
-      .select('name, email')
-      .eq('id', user.id)
-      .single();
-
-    const lenderName = userProfile?.name || userProfile?.email || 'Your Lender';
 
     // Calculate days until due or days overdue to determine reminder type
     const days = daysUntil(loan.due_date);
@@ -78,7 +69,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       reminderType,
       borrowerEmail: loan.borrower_email,
       borrowerName: loan.borrower_name,
-      lenderName,
+      lenderName: loan.lender_name,
       principalAmount: loan.principal_amount,
       interestRate: loan.interest_rate,
       dueDate: loan.due_date,

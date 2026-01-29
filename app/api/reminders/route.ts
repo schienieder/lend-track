@@ -81,6 +81,7 @@ export async function GET(request: NextRequest) {
           id,
           borrower_name,
           borrower_email,
+          lender_name,
           principal_amount,
           currency,
           due_date,

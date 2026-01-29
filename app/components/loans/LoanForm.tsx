@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select';
 import { CURRENCIES, type CurrencyCode } from '@/lib/utils';
 import type { Loan, PaymentSchedule, LoanStatus } from '@/types/loan';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 const paymentScheduleOptions = [
   { value: 'daily', label: 'Daily' },
@@ -48,6 +49,8 @@ interface LoanFormProps {
 
 const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
   const isEditing = !!loan;
+  const { user } = useAuth();
+  const defaultLenderName = user?.name || user?.email || '';
 
   const {
     register,
@@ -62,6 +65,7 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
           borrower_name: loan.borrower_name,
           borrower_email: loan.borrower_email || '',
           borrower_phone: loan.borrower_phone || '',
+          lender_name: loan.lender_name,
           principal_amount: loan.principal_amount,
           interest_rate: loan.interest_rate,
           due_date: loan.due_date.split('T')[0],
@@ -74,6 +78,7 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
           borrower_name: '',
           borrower_email: '',
           borrower_phone: '',
+          lender_name: defaultLenderName,
           principal_amount: 0,
           interest_rate: 0,
           due_date: '',
@@ -132,6 +137,19 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
           />
           {errors.borrower_phone && (
             <p className="text-sm text-destructive">{errors.borrower_phone.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="lender_name">Lender Name *</Label>
+          <Input
+            id="lender_name"
+            placeholder="Enter lender name"
+            aria-invalid={!!errors.lender_name}
+            {...register('lender_name')}
+          />
+          {errors.lender_name && (
+            <p className="text-sm text-destructive">{errors.lender_name.message}</p>
           )}
         </div>
 

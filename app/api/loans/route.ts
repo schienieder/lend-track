@@ -118,21 +118,12 @@ export async function POST(request: NextRequest) {
 
     // Send loan created email if status is active and borrower has email
     if (loan.status === 'active' && loan.borrower_email) {
-      // Get lender name from user profile
-      const { data: userProfile } = await supabase
-        .from('users')
-        .select('name, email')
-        .eq('id', user.id)
-        .single();
-
-      const lenderName = userProfile?.name || userProfile?.email || 'Your Lender';
-
       // Send email asynchronously (don't block the response)
       sendReminder({
         reminderType: 'loan_created',
         borrowerEmail: loan.borrower_email,
         borrowerName: loan.borrower_name,
-        lenderName,
+        lenderName: loan.lender_name,
         principalAmount: loan.principal_amount,
         interestRate: loan.interest_rate,
         dueDate: loan.due_date,
