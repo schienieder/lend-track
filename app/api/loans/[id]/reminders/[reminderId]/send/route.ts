@@ -21,7 +21,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Fetch the loan with user details
     const { data: loan, error: loanError } = await supabase
       .from('loans')
-      .select('id, borrower_name, borrower_email, principal_amount, interest_rate, due_date, status, user_id')
+      .select('id, borrower_name, borrower_email, principal_amount, interest_rate, currency, due_date, status, user_id')
       .eq('id', loanId)
       .eq('user_id', user.id)
       .single();
@@ -91,6 +91,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       principalAmount: loan.principal_amount,
       interestRate: loan.interest_rate,
       dueDate: loan.due_date,
+      currency: loan.currency,
       daysUntilDue,
       daysOverdue,
     });

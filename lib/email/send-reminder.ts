@@ -7,6 +7,7 @@ import {
   type LoanReminderData,
 } from '@/lib/email/templates';
 import type { ReminderType } from '@/types/reminder';
+import type { CurrencyCode } from '@/lib/utils';
 
 export interface SendReminderParams {
   reminderType: ReminderType;
@@ -16,6 +17,7 @@ export interface SendReminderParams {
   principalAmount: number;
   interestRate: number;
   dueDate: string;
+  currency: CurrencyCode;
   daysUntilDue?: number;
   daysOverdue?: number;
   customMessage?: string;
@@ -37,6 +39,7 @@ export async function sendReminder(params: SendReminderParams): Promise<SendRemi
     principalAmount,
     interestRate,
     dueDate,
+    currency,
     daysUntilDue,
     daysOverdue,
     customMessage,
@@ -54,6 +57,7 @@ export async function sendReminder(params: SendReminderParams): Promise<SendRemi
     interestRate,
     totalAmount,
     dueDate,
+    currency,
     daysUntilDue,
     daysOverdue,
   };

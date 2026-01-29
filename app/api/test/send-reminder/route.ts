@@ -10,6 +10,7 @@ export async function GET(request: Request) {
   const reminderType = (searchParams.get('type') as 'due_date' | 'overdue' | 'custom') || 'due_date';
 
   // Sample loan data for testing
+  const currency = (searchParams.get('currency') as 'PHP' | 'USD') || 'PHP';
   const testData = {
     reminderType,
     borrowerEmail: email,
@@ -18,6 +19,7 @@ export async function GET(request: Request) {
     principalAmount: 5000,
     interestRate: 5,
     dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 3 days from now
+    currency,
     daysUntilDue: reminderType === 'due_date' ? 3 : undefined,
     daysOverdue: reminderType === 'overdue' ? 5 : undefined,
     customMessage: reminderType === 'custom' ? 'This is a test custom reminder message from LendTrack.' : undefined,

@@ -120,7 +120,7 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onEdit, onDelete }) => {
                 <Banknote className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <span className="text-sm text-muted-foreground">Principal: </span>
-                  <span className="text-sm font-medium">{formatCurrency(loan.principal_amount)}</span>
+                  <span className="text-sm font-medium">{formatCurrency(loan.principal_amount, loan.currency)}</span>
                 </div>
               </div>
               <div className="flex items-center gap-3">

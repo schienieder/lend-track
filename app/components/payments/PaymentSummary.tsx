@@ -3,7 +3,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Banknote, TrendingDown, Receipt } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, type CurrencyCode } from '@/lib/utils';
 
 interface PaymentSummaryProps {
   totalPaid: number;
@@ -11,6 +11,7 @@ interface PaymentSummaryProps {
   paymentCount: number;
   principalAmount: number;
   interestRate: number;
+  currency: CurrencyCode;
 }
 
 const PaymentSummary: React.FC<PaymentSummaryProps> = ({
@@ -19,6 +20,7 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
   paymentCount,
   principalAmount,
   interestRate,
+  currency,
 }) => {
   const totalWithInterest = principalAmount * (1 + interestRate / 100);
   const progressPercentage = totalWithInterest > 0
@@ -37,7 +39,7 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
               <div>
                 <p className="text-sm text-muted-foreground">Total Paid</p>
                 <p className="text-xl font-bold text-green-600 dark:text-green-400">
-                  {formatCurrency(totalPaid)}
+                  {formatCurrency(totalPaid, currency)}
                 </p>
               </div>
             </div>
@@ -53,7 +55,7 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
               <div>
                 <p className="text-sm text-muted-foreground">Remaining Balance</p>
                 <p className="text-xl font-bold text-orange-600 dark:text-orange-400">
-                  {formatCurrency(remainingBalance)}
+                  {formatCurrency(remainingBalance, currency)}
                 </p>
               </div>
             </div>
@@ -92,8 +94,8 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
               />
             </div>
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>{formatCurrency(totalPaid)} paid</span>
-              <span>{formatCurrency(totalWithInterest)} total (with interest)</span>
+              <span>{formatCurrency(totalPaid, currency)} paid</span>
+              <span>{formatCurrency(totalWithInterest, currency)} total (with interest)</span>
             </div>
           </div>
         </CardContent>

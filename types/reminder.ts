@@ -17,6 +17,8 @@ export interface Reminder {
   updated_at: string;
 }
 
+import type { CurrencyCode } from '@/lib/utils';
+
 // Reminder with loan details (for dashboard view)
 export interface ReminderWithLoan extends Reminder {
   loans?: {
@@ -24,6 +26,7 @@ export interface ReminderWithLoan extends Reminder {
     borrower_name: string;
     borrower_email: string | null;
     principal_amount: number;
+    currency: CurrencyCode;
     due_date: string;
     status: string;
   };

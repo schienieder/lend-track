@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { CURRENCIES, type CurrencyCode } from '@/lib/utils';
 import type { Loan, PaymentSchedule, LoanStatus } from '@/types/loan';
 
 const paymentScheduleOptions = [
@@ -26,6 +27,11 @@ const paymentScheduleOptions = [
   { value: 'yearly', label: 'Yearly' },
   { value: 'one-time', label: 'One-Time' },
 ];
+
+const currencyOptions = Object.entries(CURRENCIES).map(([code, config]) => ({
+  value: code,
+  label: `${config.symbol} ${code}`,
+}));
 
 const statusOptions = [
   { value: 'active', label: 'Active' },
@@ -60,6 +66,7 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
           interest_rate: loan.interest_rate,
           due_date: loan.due_date.split('T')[0],
           payment_schedule: loan.payment_schedule,
+          currency: loan.currency || 'PHP',
           status: loan.status,
           notes: loan.notes || '',
         }
@@ -71,12 +78,14 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
           interest_rate: 0,
           due_date: '',
           payment_schedule: 'monthly',
+          currency: 'PHP',
           status: 'active',
           notes: '',
         },
   });
 
   const paymentSchedule = watch('payment_schedule');
+  const currency = watch('currency');
   const status = watch('status');
 
   const handleFormSubmit = async (data: LoanFormData) => {
@@ -191,6 +200,28 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
           </Select>
           {errors.payment_schedule && (
             <p className="text-sm text-destructive">{errors.payment_schedule.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="currency">Currency *</Label>
+          <Select
+            value={currency}
+            onValueChange={(value) => setValue('currency', value as CurrencyCode)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select currency" />
+            </SelectTrigger>
+            <SelectContent>
+              {currencyOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.currency && (
+            <p className="text-sm text-destructive">{errors.currency.message}</p>
           )}
         </div>
 

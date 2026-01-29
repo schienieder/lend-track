@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { sendReminder, daysUntil, daysSince } from '@/lib/email/send-reminder';
 import type { Reminder, ReminderConfig } from '@/types/reminder';
+import type { CurrencyCode } from '@/lib/utils';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
@@ -20,6 +21,7 @@ interface LoanWithUser {
   borrower_email: string | null;
   principal_amount: number;
   interest_rate: number;
+  currency: CurrencyCode;
   due_date: string;
   status: string;
 }
@@ -190,6 +192,7 @@ export async function processReminders(): Promise<ProcessResult> {
           borrower_email,
           principal_amount,
           interest_rate,
+          currency,
           due_date,
           status,
           user_id
@@ -258,6 +261,7 @@ export async function processReminders(): Promise<ProcessResult> {
         principalAmount: loan.principal_amount,
         interestRate: loan.interest_rate,
         dueDate: loan.due_date,
+        currency: loan.currency,
         daysUntilDue,
         daysOverdue,
       });

@@ -1,8 +1,10 @@
 import { z } from 'zod';
+import { CURRENCY_CODES } from '@/lib/utils';
 
 // Status and schedule enums as Zod schemas
 export const loanStatusSchema = z.enum(['active', 'paid', 'overdue', 'defaulted']);
 export const paymentScheduleSchema = z.enum(['daily', 'weekly', 'bi-weekly', 'monthly', 'quarterly', 'yearly', 'one-time']);
+export const currencySchema = z.enum(CURRENCY_CODES);
 
 // Schema for creating a new loan
 export const createLoanSchema = z.object({
@@ -38,6 +40,7 @@ export const createLoanSchema = z.object({
       'Please enter a valid date'
     ),
   payment_schedule: paymentScheduleSchema,
+  currency: currencySchema.optional().default('PHP'),
   status: loanStatusSchema.optional().default('active'),
   notes: z
     .string()
@@ -82,6 +85,7 @@ export const updateLoanSchema = z.object({
     )
     .optional(),
   payment_schedule: paymentScheduleSchema.optional(),
+  currency: currencySchema.optional(),
   status: loanStatusSchema.optional(),
   notes: z
     .string()
@@ -129,6 +133,7 @@ export const loanFormSchema = z.object({
     .string()
     .min(1, 'Due date is required'),
   payment_schedule: paymentScheduleSchema,
+  currency: currencySchema,
   status: loanStatusSchema.optional(),
   notes: z
     .string()

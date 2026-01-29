@@ -93,7 +93,7 @@ const LoanTable: React.FC<LoanTableProps> = ({
                 )}
               </div>
             </TableCell>
-            <TableCell>{formatCurrency(loan.principal_amount)}</TableCell>
+            <TableCell>{formatCurrency(loan.principal_amount, loan.currency)}</TableCell>
             <TableCell>{loan.interest_rate}%</TableCell>
             <TableCell>{formatDate(loan.due_date)}</TableCell>
             <TableCell>{scheduleLabels[loan.payment_schedule]}</TableCell>

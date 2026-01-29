@@ -11,8 +11,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { formatCurrency } from '@/lib/utils';
-import type { DeletePaymentDialogProps } from '@/types/payment';
+import { formatCurrency, type CurrencyCode } from '@/lib/utils';
+import type { Payment } from '@/types/payment';
+
+interface DeletePaymentDialogProps {
+  payment: Payment | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
+  currency: CurrencyCode;
+}
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -27,6 +35,7 @@ const DeletePaymentDialog: React.FC<DeletePaymentDialogProps> = ({
   open,
   onOpenChange,
   onSuccess,
+  currency,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +76,7 @@ const DeletePaymentDialog: React.FC<DeletePaymentDialogProps> = ({
           <AlertDialogTitle>Delete Payment</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete this payment of{' '}
-            <span className="font-semibold">{formatCurrency(payment.amount)}</span> from{' '}
+            <span className="font-semibold">{formatCurrency(payment.amount, currency)}</span> from{' '}
             <span className="font-semibold">{formatDate(payment.payment_date)}</span>?
             This action cannot be undone.
           </AlertDialogDescription>

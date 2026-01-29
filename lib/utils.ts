@@ -6,7 +6,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Currency configuration
-export type CurrencyCode = 'PHP' | 'USD';
+export const CURRENCY_CODES = ['PHP', 'USD'] as const;
+export type CurrencyCode = typeof CURRENCY_CODES[number];
 
 export interface CurrencyConfig {
   code: CurrencyCode;

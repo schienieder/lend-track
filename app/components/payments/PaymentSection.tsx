@@ -83,6 +83,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ loan }) => {
         paymentCount={summary.payment_count}
         principalAmount={loan.principal_amount}
         interestRate={loan.interest_rate}
+        currency={loan.currency}
       />
 
       {/* Payment History */}
@@ -108,6 +109,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ loan }) => {
               onEdit={handleEdit}
               onDelete={handleDelete}
               isLoading={isLoading}
+              currency={loan.currency}
             />
           )}
         </CardContent>
@@ -133,6 +135,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ loan }) => {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onSuccess={handleSuccess}
+        currency={loan.currency}
       />
     </div>
   );

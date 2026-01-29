@@ -17,8 +17,16 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
-import type { Payment, PaymentTableProps } from '@/types/payment';
+import { formatCurrency, type CurrencyCode } from '@/lib/utils';
+import type { Payment } from '@/types/payment';
+
+interface PaymentTableProps {
+  payments: Payment[];
+  onEdit: (payment: Payment) => void;
+  onDelete: (payment: Payment) => void;
+  isLoading?: boolean;
+  currency: CurrencyCode;
+}
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -41,6 +49,7 @@ const PaymentTable: React.FC<PaymentTableProps> = ({
   onEdit,
   onDelete,
   isLoading,
+  currency,
 }) => {
   if (isLoading) {
     return (
@@ -76,7 +85,7 @@ const PaymentTable: React.FC<PaymentTableProps> = ({
               <TableCell className="font-medium">
                 {formatDate(payment.payment_date)}
               </TableCell>
-              <TableCell>{formatCurrency(payment.amount)}</TableCell>
+              <TableCell>{formatCurrency(payment.amount, currency)}</TableCell>
               <TableCell className="hidden sm:table-cell">
                 {formatPaymentMethod(payment.payment_method)}
               </TableCell>

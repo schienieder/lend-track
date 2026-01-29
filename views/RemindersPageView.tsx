@@ -243,7 +243,7 @@ const RemindersPageView = () => {
                           {reminder.loans?.borrower_name || '-'}
                         </TableCell>
                         <TableCell className="hidden sm:table-cell">
-                          {reminder.loans ? formatCurrency(reminder.loans.principal_amount) : '-'}
+                          {reminder.loans ? formatCurrency(reminder.loans.principal_amount, reminder.loans.currency) : '-'}
                         </TableCell>
                         <TableCell>
                           {reminderTypeLabels[reminder.reminder_type]}

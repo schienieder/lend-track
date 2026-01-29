@@ -136,6 +136,7 @@ export async function POST(request: NextRequest) {
         principalAmount: loan.principal_amount,
         interestRate: loan.interest_rate,
         dueDate: loan.due_date,
+        currency: loan.currency,
         paymentSchedule: loan.payment_schedule,
       }).catch((err) => {
         console.error('Failed to send loan created email:', err);
