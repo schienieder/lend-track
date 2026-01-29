@@ -8,6 +8,7 @@ import LoanCard from '@/app/components/loans/LoanCard';
 import EditLoanDialog from '@/app/components/loans/EditLoanDialog';
 import DeleteLoanDialog from '@/app/components/loans/DeleteLoanDialog';
 import PaymentSection from '@/app/components/payments/PaymentSection';
+import ReminderSection from '@/app/components/reminders/ReminderSection';
 import type { Loan } from '@/types/loan';
 
 interface LoanDetailPageViewProps {
@@ -133,6 +134,17 @@ const LoanDetailPageView: React.FC<LoanDetailPageViewProps> = ({ loanId }) => {
         {/* Payment Section */}
         <div className="mt-8">
           <PaymentSection loan={loan} />
+        </div>
+
+        {/* Reminder Section */}
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold mb-4">Reminders</h2>
+          <ReminderSection
+            loanId={loan.id}
+            loanDueDate={loan.due_date}
+            borrowerEmail={loan.borrower_email}
+            borrowerName={loan.borrower_name}
+          />
         </div>
 
         {/* Dialogs */}
