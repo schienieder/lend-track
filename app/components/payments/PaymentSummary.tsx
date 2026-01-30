@@ -27,6 +27,16 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
     ? Math.min(100, (totalPaid / totalWithInterest) * 100)
     : 0;
 
+  // Format percentage without unnecessary decimals (e.g., 100% instead of 100.0%)
+  const formatPercentage = (value: number) => {
+    if (Number.isInteger(value)) {
+      return `${value}%`;
+    }
+    // Show one decimal only if needed
+    const formatted = value.toFixed(1);
+    return formatted.endsWith('.0') ? `${Math.round(value)}%` : `${formatted}%`;
+  };
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -85,7 +95,7 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Payment Progress</span>
-              <span className="font-medium">{progressPercentage.toFixed(1)}%</span>
+              <span className="font-medium">{formatPercentage(progressPercentage)}</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
               <div

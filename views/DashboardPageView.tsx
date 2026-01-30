@@ -15,7 +15,11 @@ import {
   Clock,
   CreditCard,
   RefreshCw,
+  ArrowRight,
+  Minus,
+  Plus,
 } from 'lucide-react';
+import Link from 'next/link';
 import type { DashboardResponse, RecentActivity } from '@/types/dashboard';
 import { formatCurrency, type CurrencyCode } from '@/lib/utils';
 
@@ -134,8 +138,8 @@ const DashboardPageView = () => {
 
         {/* Loan Statistics */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="py-4">
+            <CardContent>
               <div className="flex items-center gap-4">
                 <div className="rounded-lg bg-primary/10 p-3">
                   <Users className="h-6 w-6 text-primary" />
@@ -154,8 +158,8 @@ const DashboardPageView = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="py-4">
+            <CardContent>
               <div className="flex items-center gap-4">
                 <div className="rounded-lg bg-blue-500/10 p-3">
                   <FileText className="h-6 w-6 text-blue-500" />
@@ -174,8 +178,8 @@ const DashboardPageView = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="py-4">
+            <CardContent>
               <div className="flex items-center gap-4">
                 <div className="rounded-lg bg-green-500/10 p-3">
                   <CheckCircle className="h-6 w-6 text-green-500" />
@@ -194,8 +198,8 @@ const DashboardPageView = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="py-4">
+            <CardContent>
               <div className="flex items-center gap-4">
                 <div className="rounded-lg bg-destructive/10 p-3">
                   <AlertTriangle className="h-6 w-6 text-destructive" />
@@ -217,8 +221,8 @@ const DashboardPageView = () => {
 
         {/* Financial Statistics */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="py-4">
+            <CardContent>
               <div className="flex items-center gap-4">
                 <div className="rounded-lg bg-purple-500/10 p-3">
                   <Wallet className="h-6 w-6 text-purple-500" />
@@ -240,8 +244,8 @@ const DashboardPageView = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="py-4">
+            <CardContent>
               <div className="flex items-center gap-4">
                 <div className="rounded-lg bg-green-500/10 p-3">
                   <CreditCard className="h-6 w-6 text-green-500" />
@@ -263,8 +267,8 @@ const DashboardPageView = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="py-4">
+            <CardContent>
               <div className="flex items-center gap-4">
                 <div className="rounded-lg bg-amber-500/10 p-3">
                   <TrendingUp className="h-6 w-6 text-amber-500" />
@@ -335,8 +339,14 @@ const DashboardPageView = () => {
 
         {/* Recent Activity */}
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Recent Activity</CardTitle>
+            <Link href="/loans">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                View All
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </Button>
+            </Link>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -352,34 +362,44 @@ const DashboardPageView = () => {
                 ))}
               </div>
             ) : data?.recent_activity && data.recent_activity.length > 0 ? (
-              <ul className="space-y-4">
-                {data.recent_activity.map((activity) => (
-                  <li key={activity.id} className="flex items-center gap-3">
-                    <div className={`rounded-full p-1.5 ${getActivityIconBg(activity.type)}`}>
-                      {getActivityIcon(activity.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-muted-foreground truncate">
-                        <span className="font-medium text-foreground">
-                          {activity.borrower_name}
-                        </span>{' '}
-                        {activity.type === 'loan_created' && 'received a new loan'}
-                        {activity.type === 'payment_received' && 'made a payment'}
-                        {activity.type === 'loan_paid_off' && 'paid off their loan'}
-                        {activity.type === 'loan_overdue' && 'loan is overdue'}
-                        {activity.amount && (
-                          <span className="text-foreground font-medium">
-                            {' '}
-                            - {formatCurrency(activity.amount, activity.currency || 'PHP')}
+              <ul className="divide-y divide-border">
+                {data.recent_activity.map((activity) => {
+                  const isPayment = activity.type === 'payment_received' || activity.type === 'loan_paid_off';
+                  const isLoan = activity.type === 'loan_created';
+
+                  return (
+                    <li key={activity.id} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
+                      <div className={`rounded-full p-2 ${getActivityIconBg(activity.type)}`}>
+                        {getActivityIcon(activity.type)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-foreground">
+                          <span className="font-semibold">
+                            {activity.borrower_name}
+                          </span>{' '}
+                          <span className="text-muted-foreground">
+                            {activity.type === 'loan_created' && 'received a new loan'}
+                            {activity.type === 'payment_received' && 'made a payment'}
+                            {activity.type === 'loan_paid_off' && 'paid off their loan'}
+                            {activity.type === 'loan_overdue' && 'loan is overdue'}
                           </span>
-                        )}
-                      </p>
-                    </div>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {formatDate(activity.timestamp)}
-                    </span>
-                  </li>
-                ))}
+                        </p>
+                      </div>
+                      {activity.amount && (
+                        <span className={`font-semibold whitespace-nowrap flex items-center gap-1 ${
+                          isPayment ? 'text-green-500' : isLoan ? 'text-orange-500' : 'text-foreground'
+                        }`}>
+                          {isPayment && <Plus className="h-3 w-3" />}
+                          {isLoan && <Minus className="h-3 w-3" />}
+                          {formatCurrency(activity.amount, activity.currency || 'PHP')}
+                        </span>
+                      )}
+                      <span className="text-sm text-muted-foreground whitespace-nowrap">
+                        {formatDate(activity.timestamp)}
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
             ) : (
               <div className="text-center py-8">
