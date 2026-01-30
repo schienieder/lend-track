@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   AreaChart,
   Area,
@@ -11,51 +11,52 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BarChart3 } from 'lucide-react';
 import type { ChartDataResponse } from '@/types/dashboard';
 import { formatCurrency, type CurrencyCode } from '@/lib/utils';
 
 interface FinancialOverviewChartProps {
-  onRefresh?: number; // Increment to trigger refresh
+  selectedYear: string; // Controlled from parent
 }
 
-const FinancialOverviewChart = ({ onRefresh }: FinancialOverviewChartProps) => {
+const FinancialOverviewChart = ({ selectedYear }: FinancialOverviewChartProps) => {
   const [data, setData] = useState<ChartDataResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedYear, setSelectedYear] = useState<string>('current');
-
-  const fetchChartData = useCallback(async (year: string) => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/dashboard/chart?year=${year}`);
-      const result = await response.json();
-
-      if (response.ok) {
-        setData(result);
-      }
-    } catch (err) {
-      console.error('Failed to fetch chart data:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
-    fetchChartData(selectedYear);
-  }, [fetchChartData, selectedYear, onRefresh]);
+    let isCancelled = false;
 
-  const handleYearChange = (value: string) => {
-    setSelectedYear(value);
-  };
+    const fetchChartData = async () => {
+      // Only show loading skeleton on first fetch (smoother UX on year changes)
+      if (!hasFetchedRef.current) {
+        setIsLoading(true);
+      }
+
+      try {
+        const response = await fetch(`/api/dashboard/chart?year=${selectedYear}`);
+        const result = await response.json();
+
+        if (!isCancelled && response.ok) {
+          setData(result);
+          hasFetchedRef.current = true;
+        }
+      } catch (err) {
+        console.error('Failed to fetch chart data:', err);
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchChartData();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedYear]);
 
   const formatYAxisValue = (value: number) => {
     if (value >= 1000000) {
@@ -109,123 +110,99 @@ const FinancialOverviewChart = ({ onRefresh }: FinancialOverviewChartProps) => {
     return null;
   };
 
-  const currentYear = new Date().getFullYear();
-
   return (
-    <Card className="h-full">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-base font-medium flex items-center gap-2">
-          <BarChart3 className="h-4 w-4 text-muted-foreground" />
-          Financial Overview
-        </CardTitle>
-        <Select value={selectedYear} onValueChange={handleYearChange}>
-          <SelectTrigger className="w-[130px]">
-            <SelectValue placeholder="Select year" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="current">{currentYear}</SelectItem>
-            {data?.availableYears
-              .filter((year) => year !== currentYear)
-              .map((year) => (
-                <SelectItem key={year} value={year.toString()}>
-                  {year}
-                </SelectItem>
-              ))}
-            {data?.availableYears && data.availableYears.length > 1 && (
-              <SelectItem value="all">All Time</SelectItem>
-            )}
-          </SelectContent>
-        </Select>
-      </CardHeader>
-      <CardContent className="pt-4">
-        {isLoading ? (
-          <div className="space-y-3">
-            <Skeleton className="h-[250px] w-full" />
+    <div className="rounded-lg border border-border p-4">
+      <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2 mb-4">
+        <BarChart3 className="h-4 w-4" />
+        Financial Trends
+      </h3>
+      {isLoading ? (
+        <div className="space-y-3">
+          <Skeleton className="h-[250px] w-full" />
+        </div>
+      ) : data && data.data.length > 0 ? (
+        <div className="h-[280px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={data.data}
+              margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id="loansGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="paymentsGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="interestGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#eab308" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#eab308" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid stroke="#d1d5db" strokeWidth={1} vertical={false} />
+              <XAxis
+                dataKey="period"
+                tick={{ fontSize: 12, fill: 'currentColor' }}
+                tickLine={false}
+                axisLine={false}
+                className="text-muted-foreground"
+              />
+              <YAxis
+                tickFormatter={formatYAxisValue}
+                tick={{ fontSize: 12, fill: 'currentColor' }}
+                tickLine={false}
+                axisLine={false}
+                className="text-muted-foreground"
+                width={50}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend
+                formatter={(value) => {
+                  if (value === 'loansAmount') return 'Loans Disbursed';
+                  if (value === 'paymentsAmount') return 'Payments Collected';
+                  return 'Interest Earned';
+                }}
+                wrapperStyle={{ fontSize: '12px' }}
+              />
+              <Area
+                type="monotone"
+                dataKey="loansAmount"
+                stroke="#f97316"
+                fill="url(#loansGradient)"
+                strokeWidth={2}
+                name="loansAmount"
+              />
+              <Area
+                type="monotone"
+                dataKey="paymentsAmount"
+                stroke="#22c55e"
+                fill="url(#paymentsGradient)"
+                strokeWidth={2}
+                name="paymentsAmount"
+              />
+              <Area
+                type="monotone"
+                dataKey="interestAmount"
+                stroke="#eab308"
+                fill="url(#interestGradient)"
+                strokeWidth={2}
+                name="interestAmount"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <div className="flex items-center justify-center h-[280px] text-muted-foreground">
+          <div className="text-center">
+            <BarChart3 className="h-12 w-12 mx-auto mb-3 opacity-50" />
+            <p>No data available</p>
+            <p className="text-sm mt-1">Create loans to see the overview</p>
           </div>
-        ) : data && data.data.length > 0 ? (
-          <div className="h-[280px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={data.data}
-                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-              >
-                <defs>
-                  <linearGradient id="loansGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="paymentsGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="interestGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#eab308" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#eab308" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid stroke="#d1d5db" strokeWidth={1} vertical={false} />
-                <XAxis
-                  dataKey="period"
-                  tick={{ fontSize: 12, fill: 'currentColor' }}
-                  tickLine={false}
-                  axisLine={false}
-                  className="text-muted-foreground"
-                />
-                <YAxis
-                  tickFormatter={formatYAxisValue}
-                  tick={{ fontSize: 12, fill: 'currentColor' }}
-                  tickLine={false}
-                  axisLine={false}
-                  className="text-muted-foreground"
-                  width={50}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend
-                  formatter={(value) => {
-                    if (value === 'loansAmount') return 'Loans Disbursed';
-                    if (value === 'paymentsAmount') return 'Payments Collected';
-                    return 'Interest Earned';
-                  }}
-                  wrapperStyle={{ fontSize: '12px' }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="loansAmount"
-                  stroke="#f97316"
-                  fill="url(#loansGradient)"
-                  strokeWidth={2}
-                  name="loansAmount"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="paymentsAmount"
-                  stroke="#22c55e"
-                  fill="url(#paymentsGradient)"
-                  strokeWidth={2}
-                  name="paymentsAmount"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="interestAmount"
-                  stroke="#eab308"
-                  fill="url(#interestGradient)"
-                  strokeWidth={2}
-                  name="interestAmount"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center h-[280px] text-muted-foreground">
-            <div className="text-center">
-              <BarChart3 className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>No data available</p>
-              <p className="text-sm mt-1">Create loans to see the overview</p>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+      )}
+    </div>
   );
 };
 

@@ -2,17 +2,25 @@ import type { CurrencyCode } from '@/lib/utils';
 
 // Dashboard statistics interface
 export interface DashboardStats {
-  // Loan counts
-  total_loans: number;
+  // Current state metrics (always live, unaffected by year filter)
   active_loans: number;
   overdue_loans: number;
+  total_outstanding: number;
+  outstanding_currency: CurrencyCode;
+
+  // Filtered metrics (affected by year filter)
+  total_loans: number;
   paid_loans: number;
-
-  // Borrower count
   total_borrowers: number;
+  total_collected: number;
+  total_interest_earned: number;
+  filtered_currency: CurrencyCode;
 
-  // Financial metrics (grouped by currency)
+  // Financial metrics (grouped by currency) - filtered by year
   financial_summary: CurrencyFinancialSummary[];
+
+  // Available years for the dropdown
+  available_years: number[];
 }
 
 export interface CurrencyFinancialSummary {
