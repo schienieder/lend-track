@@ -146,11 +146,11 @@ export async function GET() {
       financial_summary,
     };
 
-    // Build recent activity (last 10 items)
+    // Build recent activity (last 15 items)
     const recent_activity: RecentActivity[] = [];
 
     // Add recent loans (created in the last 30 days)
-    typedLoans.slice(0, 5).forEach((loan) => {
+    typedLoans.slice(0, 8).forEach((loan) => {
       recent_activity.push({
         id: `loan-${loan.id}`,
         type: 'loan_created',
@@ -163,7 +163,7 @@ export async function GET() {
     });
 
     // Add recent payments
-    typedPayments.slice(0, 5).forEach((payment) => {
+    typedPayments.slice(0, 8).forEach((payment) => {
       const loan = typedLoans.find((l) => l.id === payment.loan_id);
       if (loan) {
         recent_activity.push({
@@ -178,11 +178,11 @@ export async function GET() {
       }
     });
 
-    // Sort by timestamp descending and limit to 10
+    // Sort by timestamp descending and limit to 15
     recent_activity.sort(
       (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     );
-    const limitedActivity = recent_activity.slice(0, 10);
+    const limitedActivity = recent_activity.slice(0, 15);
 
     const response: DashboardResponse = {
       stats,

@@ -47,3 +47,17 @@ export interface DashboardErrorResponse {
   error: string;
   details?: unknown;
 }
+
+// Chart data types
+export interface ChartDataPoint {
+  period: string; // Month name (e.g., "Jan") or year (e.g., "2024")
+  loansAmount: number;
+  paymentsAmount: number;
+  interestAmount: number;
+}
+
+export interface ChartDataResponse {
+  data: ChartDataPoint[];
+  availableYears: number[];
+  currency: CurrencyCode;
+}

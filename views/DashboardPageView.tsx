@@ -15,15 +15,21 @@ import {
   Clock,
   CreditCard,
   RefreshCw,
+  ArrowRight,
+  Minus,
+  Plus,
 } from 'lucide-react';
+import Link from 'next/link';
 import type { DashboardResponse, RecentActivity } from '@/types/dashboard';
 import { formatCurrency, type CurrencyCode } from '@/lib/utils';
+import FinancialOverviewChart from '@/app/components/dashboard/FinancialOverviewChart';
 
 const DashboardPageView = () => {
   const { user } = useAuth();
   const [data, setData] = useState<DashboardResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [chartRefresh, setChartRefresh] = useState(0);
 
   const fetchDashboardData = useCallback(async () => {
     setIsLoading(true);
@@ -38,6 +44,7 @@ const DashboardPageView = () => {
       }
 
       setData(result);
+      setChartRefresh((prev) => prev + 1);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
       setError(errorMessage);
@@ -134,8 +141,8 @@ const DashboardPageView = () => {
 
         {/* Loan Statistics */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="py-4">
+            <CardContent>
               <div className="flex items-center gap-4">
                 <div className="rounded-lg bg-primary/10 p-3">
                   <Users className="h-6 w-6 text-primary" />
@@ -154,8 +161,8 @@ const DashboardPageView = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="py-4">
+            <CardContent>
               <div className="flex items-center gap-4">
                 <div className="rounded-lg bg-blue-500/10 p-3">
                   <FileText className="h-6 w-6 text-blue-500" />
@@ -174,8 +181,8 @@ const DashboardPageView = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="py-4">
+            <CardContent>
               <div className="flex items-center gap-4">
                 <div className="rounded-lg bg-green-500/10 p-3">
                   <CheckCircle className="h-6 w-6 text-green-500" />
@@ -194,8 +201,8 @@ const DashboardPageView = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="py-4">
+            <CardContent>
               <div className="flex items-center gap-4">
                 <div className="rounded-lg bg-destructive/10 p-3">
                   <AlertTriangle className="h-6 w-6 text-destructive" />
@@ -217,8 +224,8 @@ const DashboardPageView = () => {
 
         {/* Financial Statistics */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="py-4">
+            <CardContent>
               <div className="flex items-center gap-4">
                 <div className="rounded-lg bg-purple-500/10 p-3">
                   <Wallet className="h-6 w-6 text-purple-500" />
@@ -240,8 +247,8 @@ const DashboardPageView = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="py-4">
+            <CardContent>
               <div className="flex items-center gap-4">
                 <div className="rounded-lg bg-green-500/10 p-3">
                   <CreditCard className="h-6 w-6 text-green-500" />
@@ -263,8 +270,8 @@ const DashboardPageView = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="py-4">
+            <CardContent>
               <div className="flex items-center gap-4">
                 <div className="rounded-lg bg-amber-500/10 p-3">
                   <TrendingUp className="h-6 w-6 text-amber-500" />
@@ -333,64 +340,92 @@ const DashboardPageView = () => {
           </div>
         )}
 
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="space-y-4">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <Skeleton className="h-8 w-8 rounded-full" />
-                    <div className="flex-1">
-                      <Skeleton className="h-4 w-3/4" />
-                    </div>
-                    <Skeleton className="h-4 w-16" />
+        {/* Chart and Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Monthly Overview Chart */}
+          <div className="lg:col-span-3">
+            <FinancialOverviewChart onRefresh={chartRefresh} />
+          </div>
+
+          {/* Recent Activity */}
+          <div className="lg:col-span-2">
+            <Card className="h-full">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Recent Activity</CardTitle>
+                <Link href="/loans">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                    View All
+                    <ArrowRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </Link>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="space-y-4">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <Skeleton className="h-8 w-8 rounded-full" />
+                        <div className="flex-1">
+                          <Skeleton className="h-4 w-3/4" />
+                        </div>
+                        <Skeleton className="h-4 w-16" />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            ) : data?.recent_activity && data.recent_activity.length > 0 ? (
-              <ul className="space-y-4">
-                {data.recent_activity.map((activity) => (
-                  <li key={activity.id} className="flex items-center gap-3">
-                    <div className={`rounded-full p-1.5 ${getActivityIconBg(activity.type)}`}>
-                      {getActivityIcon(activity.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-muted-foreground truncate">
-                        <span className="font-medium text-foreground">
-                          {activity.borrower_name}
-                        </span>{' '}
-                        {activity.type === 'loan_created' && 'received a new loan'}
-                        {activity.type === 'payment_received' && 'made a payment'}
-                        {activity.type === 'loan_paid_off' && 'paid off their loan'}
-                        {activity.type === 'loan_overdue' && 'loan is overdue'}
-                        {activity.amount && (
-                          <span className="text-foreground font-medium">
-                            {' '}
-                            - {formatCurrency(activity.amount, activity.currency || 'PHP')}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {formatDate(activity.timestamp)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">No recent activity</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Create your first loan to get started
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                ) : data?.recent_activity && data.recent_activity.length > 0 ? (
+                  <ul className="divide-y divide-border max-h-[280px] overflow-y-auto">
+                    {data.recent_activity.map((activity) => {
+                      const isPayment = activity.type === 'payment_received' || activity.type === 'loan_paid_off';
+                      const isLoan = activity.type === 'loan_created';
+
+                      return (
+                        <li key={activity.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+                          <div className={`rounded-full p-2 shrink-0 ${getActivityIconBg(activity.type)}`}>
+                            {getActivityIcon(activity.type)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-foreground text-sm">
+                              <span className="font-semibold">
+                                {activity.borrower_name}
+                              </span>{' '}
+                              <span className="text-muted-foreground">
+                                {activity.type === 'loan_created' && 'received a loan'}
+                                {activity.type === 'payment_received' && 'made a payment'}
+                                {activity.type === 'loan_paid_off' && 'paid off loan'}
+                                {activity.type === 'loan_overdue' && 'loan overdue'}
+                              </span>
+                            </p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              {activity.amount && (
+                                <span className={`text-sm font-medium flex items-center gap-0.5 ${
+                                  isPayment ? 'text-green-500' : isLoan ? 'text-orange-500' : 'text-foreground'
+                                }`}>
+                                  {isPayment && <Plus className="h-3 w-3" />}
+                                  {isLoan && <Minus className="h-3 w-3" />}
+                                  {formatCurrency(activity.amount, activity.currency || 'PHP')}
+                                </span>
+                              )}
+                              <span className="text-xs text-muted-foreground">
+                                {formatDate(activity.timestamp)}
+                              </span>
+                            </div>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">No recent activity</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Create your first loan to get started
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

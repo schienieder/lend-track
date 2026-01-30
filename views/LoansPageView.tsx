@@ -1,9 +1,16 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import LoanFilters from '@/app/components/loans/LoanFilters';
 import LoanTable from '@/app/components/loans/LoanTable';
 import CreateLoanDialog from '@/app/components/loans/CreateLoanDialog';
@@ -95,6 +102,10 @@ const LoansPageView = () => {
     setFilters((prev) => ({ ...prev, page: newPage }));
   };
 
+  const handleLimitChange = (newLimit: string) => {
+    setFilters((prev) => ({ ...prev, limit: Number(newLimit), page: 1 }));
+  };
+
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -111,15 +122,12 @@ const LoansPageView = () => {
           </Button>
         </div>
 
-        <Card>
-          <CardHeader className="border-b">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <CardTitle>All Loans</CardTitle>
-              <LoanFilters
-                currentFilters={filters}
-                onFilterChange={handleFilterChange}
-              />
-            </div>
+        <Card className="py-0 gap-0">
+          <CardHeader className="border-b px-6 py-4 !pb-4">
+            <LoanFilters
+              currentFilters={filters}
+              onFilterChange={handleFilterChange}
+            />
           </CardHeader>
           <CardContent className="p-0">
             {error ? (
@@ -139,36 +147,58 @@ const LoansPageView = () => {
               />
             )}
           </CardContent>
-        </Card>
 
-        {/* Pagination */}
-        {pagination.total_pages > 1 && (
-          <div className="mt-4 flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
-              {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
-              {pagination.total} loans
-            </p>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(pagination.page - 1)}
-                disabled={pagination.page <= 1}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(pagination.page + 1)}
-                disabled={pagination.page >= pagination.total_pages}
-              >
-                Next
-              </Button>
+          {/* Pagination */}
+          {pagination.total > 0 && (
+            <div className="border-t px-6 py-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>Show</span>
+                <Select
+                  value={String(filters.limit)}
+                  onValueChange={handleLimitChange}
+                >
+                  <SelectTrigger className="w-[70px] h-8">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span>
+                  of {pagination.total} {pagination.total === 1 ? 'loan' : 'loans'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  Page {pagination.page} of {pagination.total_pages || 1}
+                </span>
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handlePageChange(pagination.page - 1)}
+                    disabled={pagination.page <= 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handlePageChange(pagination.page + 1)}
+                    disabled={pagination.page >= pagination.total_pages}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </Card>
 
         {/* Dialogs */}
         <CreateLoanDialog

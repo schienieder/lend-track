@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -19,7 +19,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Bell, BellOff, ExternalLink } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Bell, BellOff, Clock, MoreHorizontal, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import ReminderStatusBadge from '@/app/components/reminders/ReminderStatusBadge';
 import { formatCurrency } from '@/lib/utils';
 import type { ReminderWithLoan, ReminderSentStatus, ReminderType, ReminderQueryParams } from '@/types/reminder';
@@ -46,14 +52,14 @@ const RemindersPageView = () => {
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 20,
+    limit: 10,
     total: 0,
     total_pages: 0,
   });
 
   const [filters, setFilters] = useState<ReminderQueryParams>({
     page: 1,
-    limit: 20,
+    limit: 10,
     sort_by: 'reminder_date',
     sort_order: 'asc',
   });
@@ -112,6 +118,10 @@ const RemindersPageView = () => {
     setFilters((prev) => ({ ...prev, page: newPage }));
   };
 
+  const handleLimitChange = (newLimit: string) => {
+    setFilters((prev) => ({ ...prev, limit: Number(newLimit), page: 1 }));
+  };
+
   // Calculate summary stats
   const pendingCount = reminders.filter((r) => r.sent_status === 'pending').length;
   const sentCount = reminders.filter((r) => r.sent_status === 'sent').length;
@@ -128,38 +138,44 @@ const RemindersPageView = () => {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid gap-4 md:grid-cols-3 mb-8">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-2">
-                <Bell className="h-5 w-5 text-yellow-600" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
+          <Card className="py-4">
+            <CardContent>
+              <div className="flex items-center gap-4">
+                <div className="rounded-lg bg-yellow-500/10 p-3">
+                  <Clock className="h-6 w-6 text-yellow-500" />
+                </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Pending</p>
-                  <p className="text-2xl font-bold">{pendingCount}</p>
+                  <p className="text-2xl font-semibold text-foreground">{pendingCount}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-2">
-                <Bell className="h-5 w-5 text-green-600" />
+          <Card className="py-4">
+            <CardContent>
+              <div className="flex items-center gap-4">
+                <div className="rounded-lg bg-green-500/10 p-3">
+                  <Bell className="h-6 w-6 text-green-500" />
+                </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Sent</p>
-                  <p className="text-2xl font-bold">{sentCount}</p>
+                  <p className="text-2xl font-semibold text-foreground">{sentCount}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-2">
-                <BellOff className="h-5 w-5 text-red-600" />
+          <Card className="py-4">
+            <CardContent>
+              <div className="flex items-center gap-4">
+                <div className="rounded-lg bg-destructive/10 p-3">
+                  <BellOff className="h-6 w-6 text-destructive" />
+                </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Failed</p>
-                  <p className="text-2xl font-bold">{failedCount}</p>
+                  <p className="text-2xl font-semibold text-foreground">{failedCount}</p>
                 </div>
               </div>
             </CardContent>
@@ -167,20 +183,19 @@ const RemindersPageView = () => {
         </div>
 
         {/* Filters and Table */}
-        <Card>
-          <CardHeader className="border-b">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <CardTitle>All Reminders</CardTitle>
-              <div className="flex gap-2">
+        <Card className="py-0 gap-0">
+          <CardHeader className="border-b px-6 py-4 !pb-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <div className="flex flex-wrap gap-2">
                 <Select
                   value={filters.sent_status || 'all'}
                   onValueChange={handleStatusFilterChange}
                 >
-                  <SelectTrigger className="w-[130px]">
+                  <SelectTrigger className="w-[140px]">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="sent">Sent</SelectItem>
                     <SelectItem value="failed">Failed</SelectItem>
@@ -191,7 +206,7 @@ const RemindersPageView = () => {
                   value={filters.reminder_type || 'all'}
                   onValueChange={handleTypeFilterChange}
                 >
-                  <SelectTrigger className="w-[130px]">
+                  <SelectTrigger className="w-[140px]">
                     <SelectValue placeholder="Type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -213,91 +228,125 @@ const RemindersPageView = () => {
                 </Button>
               </div>
             ) : isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <p className="text-muted-foreground">Loading reminders...</p>
+              <div className="flex items-center justify-center py-8">
+                <div className="text-muted-foreground">Loading reminders...</div>
               </div>
             ) : reminders.length === 0 ? (
-              <div className="flex items-center justify-center py-12">
+              <div className="flex flex-col items-center justify-center py-12 text-center">
                 <p className="text-muted-foreground">No reminders found.</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Reminders will appear here when loans have upcoming due dates.
+                </p>
               </div>
             ) : (
-              <div className="rounded-md">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Borrower</TableHead>
-                      <TableHead className="hidden sm:table-cell">Amount</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="w-[70px]">Loan</TableHead>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Borrower</TableHead>
+                    <TableHead className="hidden sm:table-cell">Amount</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="w-[70px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {reminders.map((reminder) => (
+                    <TableRow key={reminder.id}>
+                      <TableCell className="font-medium">
+                        {formatDate(reminder.reminder_date)}
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{reminder.loans?.borrower_name || '-'}</div>
+                          {reminder.loans?.borrower_email && (
+                            <div className="text-sm text-muted-foreground">{reminder.loans.borrower_email}</div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        {reminder.loans ? formatCurrency(reminder.loans.principal_amount, reminder.loans.currency) : '-'}
+                      </TableCell>
+                      <TableCell>
+                        {reminderTypeLabels[reminder.reminder_type]}
+                      </TableCell>
+                      <TableCell>
+                        <ReminderStatusBadge status={reminder.sent_status} />
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Open menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => router.push(`/loans/${reminder.loan_id}`)}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              View Loan
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {reminders.map((reminder) => (
-                      <TableRow key={reminder.id}>
-                        <TableCell className="font-medium">
-                          {formatDate(reminder.reminder_date)}
-                        </TableCell>
-                        <TableCell>
-                          {reminder.loans?.borrower_name || '-'}
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          {reminder.loans ? formatCurrency(reminder.loans.principal_amount, reminder.loans.currency) : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {reminderTypeLabels[reminder.reminder_type]}
-                        </TableCell>
-                        <TableCell>
-                          <ReminderStatusBadge status={reminder.sent_status} />
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => router.push(`/loans/${reminder.loan_id}`)}
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                            <span className="sr-only">View loan</span>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                  ))}
+                </TableBody>
+              </Table>
             )}
           </CardContent>
-        </Card>
 
-        {/* Pagination */}
-        {pagination.total_pages > 1 && (
-          <div className="mt-4 flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
-              {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
-              {pagination.total} reminders
-            </p>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(pagination.page - 1)}
-                disabled={pagination.page <= 1}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(pagination.page + 1)}
-                disabled={pagination.page >= pagination.total_pages}
-              >
-                Next
-              </Button>
+          {/* Pagination */}
+          {pagination.total > 0 && (
+            <div className="border-t px-6 py-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>Show</span>
+                <Select
+                  value={String(filters.limit)}
+                  onValueChange={handleLimitChange}
+                >
+                  <SelectTrigger className="w-[70px] h-8">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span>
+                  of {pagination.total} {pagination.total === 1 ? 'reminder' : 'reminders'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  Page {pagination.page} of {pagination.total_pages || 1}
+                </span>
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handlePageChange(pagination.page - 1)}
+                    disabled={pagination.page <= 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handlePageChange(pagination.page + 1)}
+                    disabled={pagination.page >= pagination.total_pages}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </Card>
       </div>
     </div>
   );
