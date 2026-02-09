@@ -1,4 +1,4 @@
-import { sendEmail } from '@/lib/brevo';
+import { sendEmail } from '@/lib/email/send-email';
 import {
   getDueDateReminderTemplate,
   getOverdueReminderTemplate,
