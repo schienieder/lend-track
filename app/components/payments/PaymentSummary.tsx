@@ -11,6 +11,8 @@ interface PaymentSummaryProps {
   paymentCount: number;
   principalAmount: number;
   interestRate: number;
+  isFixedInterest?: boolean;
+  fixedInterestAmount?: number;
   currency: CurrencyCode;
 }
 
@@ -20,9 +22,13 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({
   paymentCount,
   principalAmount,
   interestRate,
+  isFixedInterest = false,
+  fixedInterestAmount = 0,
   currency,
 }) => {
-  const totalWithInterest = principalAmount * (1 + interestRate / 100);
+  const totalWithInterest = isFixedInterest
+    ? principalAmount + fixedInterestAmount
+    : principalAmount * (1 + interestRate / 100);
   const progressPercentage = totalWithInterest > 0
     ? Math.min(100, (totalPaid / totalWithInterest) * 100)
     : 0;

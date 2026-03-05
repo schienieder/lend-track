@@ -83,6 +83,8 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ loan }) => {
         paymentCount={summary.payment_count}
         principalAmount={loan.principal_amount}
         interestRate={loan.interest_rate}
+        isFixedInterest={loan.is_fixed_interest}
+        fixedInterestAmount={loan.fixed_interest_amount}
         currency={loan.currency}
       />
 

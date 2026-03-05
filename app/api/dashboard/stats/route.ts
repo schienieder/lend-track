@@ -9,6 +9,7 @@ import type {
   CurrencyFinancialSummary,
 } from '@/types/dashboard';
 import type { CurrencyCode } from '@/lib/utils';
+import { getInterestAmount, calculateTotalWithInterest } from '@/lib/loan-utils';
 
 // GET /api/dashboard/stats - Get dashboard statistics
 export async function GET(request: Request) {
@@ -119,8 +120,12 @@ export async function GET(request: Request) {
         if (loan.status === 'active' || loan.status === 'overdue') {
           const loanPayments = paymentsByLoan[loan.id] || [];
           const paidForLoan = loanPayments.reduce((sum, payment) => sum + payment.amount, 0);
-          const interestAmount = loan.principal_amount * (loan.interest_rate / 100);
-          const totalDue = loan.principal_amount + interestAmount;
+          const totalDue = calculateTotalWithInterest(
+            loan.principal_amount,
+            loan.interest_rate,
+            loan.is_fixed_interest,
+            loan.fixed_interest_amount
+          );
           total_outstanding += Math.max(0, totalDue - paidForLoan);
         }
       });
@@ -185,9 +190,13 @@ export async function GET(request: Request) {
         // Skip if no payments in this period
         if (paidInPeriod === 0) return;
 
-        const interestAmount = loan.principal_amount * (loan.interest_rate / 100);
+        const interestAmount = getInterestAmount(
+          loan.principal_amount,
+          loan.interest_rate,
+          loan.is_fixed_interest,
+          loan.fixed_interest_amount
+        );
         const allLoanPayments = paymentsByLoan[loan.id] || [];
-        const totalPaid = allLoanPayments.reduce((sum, payment) => sum + payment.amount, 0);
 
         // Calculate cumulative paid BEFORE this period to determine interest portion
         const paymentsBeforePeriod = allLoanPayments.filter((p) => {
@@ -238,7 +247,12 @@ export async function GET(request: Request) {
           const paidInPeriod = loanPaymentsInPeriod.reduce((sum, payment) => sum + payment.amount, 0);
           currency_total_paid += paidInPeriod;
 
-          const interestAmount = loan.principal_amount * (loan.interest_rate / 100);
+          const interestAmount = getInterestAmount(
+            loan.principal_amount,
+            loan.interest_rate,
+            loan.is_fixed_interest,
+            loan.fixed_interest_amount
+          );
           const totalDue = loan.principal_amount + interestAmount;
 
           // Use all payments for outstanding calculation (current state)

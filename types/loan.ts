@@ -16,6 +16,8 @@ export interface Loan {
   lender_name: string;
   principal_amount: number;
   interest_rate: number;
+  is_fixed_interest: boolean;
+  fixed_interest_amount: number;
   due_date: string;
   payment_schedule: PaymentSchedule;
   currency: CurrencyCode;
@@ -33,6 +35,8 @@ export interface CreateLoanInput {
   lender_name: string;
   principal_amount: number;
   interest_rate: number;
+  is_fixed_interest?: boolean;
+  fixed_interest_amount?: number;
   due_date: string;
   payment_schedule: PaymentSchedule;
   currency?: CurrencyCode;
@@ -48,6 +52,8 @@ export interface UpdateLoanInput {
   lender_name?: string;
   principal_amount?: number;
   interest_rate?: number;
+  is_fixed_interest?: boolean;
+  fixed_interest_amount?: number;
   due_date?: string;
   payment_schedule?: PaymentSchedule;
   currency?: CurrencyCode;

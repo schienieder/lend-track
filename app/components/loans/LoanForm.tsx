@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { CURRENCIES, type CurrencyCode } from '@/lib/utils';
 import type { Loan, PaymentSchedule, LoanStatus } from '@/types/loan';
 import { useAuth } from '@/app/contexts/AuthContext';
@@ -68,6 +69,8 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
           lender_name: loan.lender_name,
           principal_amount: loan.principal_amount,
           interest_rate: loan.interest_rate,
+          is_fixed_interest: loan.is_fixed_interest || false,
+          fixed_interest_amount: loan.fixed_interest_amount || 0,
           due_date: loan.due_date.split('T')[0],
           payment_schedule: loan.payment_schedule,
           currency: loan.currency || 'PHP',
@@ -81,6 +84,8 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
           lender_name: defaultLenderName,
           principal_amount: 0,
           interest_rate: 0,
+          is_fixed_interest: false,
+          fixed_interest_amount: 0,
           due_date: '',
           payment_schedule: 'monthly',
           currency: 'PHP',
@@ -92,6 +97,7 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
   const paymentSchedule = watch('payment_schedule');
   const currency = watch('currency');
   const status = watch('status');
+  const isFixedInterest = watch('is_fixed_interest');
 
   const handleFormSubmit = async (data: LoanFormData) => {
     await onSubmit(data);
@@ -169,21 +175,58 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
           )}
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="interest_rate">Interest Rate (%) *</Label>
-          <Input
-            id="interest_rate"
-            type="number"
-            step="0.01"
-            min="0"
-            max="100"
-            placeholder="Enter interest rate"
-            aria-invalid={!!errors.interest_rate}
-            {...register('interest_rate', { valueAsNumber: true })}
+        {isFixedInterest ? (
+          <div className="space-y-2">
+            <Label htmlFor="fixed_interest_amount">Fixed Interest Amount *</Label>
+            <Input
+              id="fixed_interest_amount"
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="Enter fixed interest amount"
+              aria-invalid={!!errors.fixed_interest_amount}
+              {...register('fixed_interest_amount', { valueAsNumber: true })}
+            />
+            {errors.fixed_interest_amount && (
+              <p className="text-sm text-destructive">{errors.fixed_interest_amount.message}</p>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <Label htmlFor="interest_rate">Interest Rate (%) *</Label>
+            <Input
+              id="interest_rate"
+              type="number"
+              step="0.01"
+              min="0"
+              max="100"
+              placeholder="Enter interest rate"
+              aria-invalid={!!errors.interest_rate}
+              {...register('interest_rate', { valueAsNumber: true })}
+            />
+            {errors.interest_rate && (
+              <p className="text-sm text-destructive">{errors.interest_rate.message}</p>
+            )}
+          </div>
+        )}
+
+        <div className="hidden sm:block" />
+        <div className="flex items-center gap-2">
+          <Switch
+            id="is_fixed_interest"
+            checked={isFixedInterest || false}
+            onCheckedChange={(checked) => {
+              setValue('is_fixed_interest', checked);
+              if (checked) {
+                setValue('interest_rate', 0);
+              } else {
+                setValue('fixed_interest_amount', 0);
+              }
+            }}
           />
-          {errors.interest_rate && (
-            <p className="text-sm text-destructive">{errors.interest_rate.message}</p>
-          )}
+          <Label htmlFor="is_fixed_interest" className="text-sm cursor-pointer">
+            Fixed Interest Amount?
+          </Label>
         </div>
 
         <div className="space-y-2">

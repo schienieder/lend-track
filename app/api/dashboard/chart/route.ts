@@ -12,7 +12,16 @@ function calculateInterestFromPayment(payment: Payment, loan: Loan, totalPaidBef
   // Interest is any amount paid beyond the principal
   const remainingPrincipal = Math.max(0, loan.principal_amount - totalPaidBefore);
   const principalPortion = Math.min(payment.amount, remainingPrincipal);
-  return payment.amount - principalPortion;
+  const interestPortion = payment.amount - principalPortion;
+
+  // Cap at the loan's total interest amount
+  const totalInterest = loan.is_fixed_interest
+    ? (loan.fixed_interest_amount || 0)
+    : loan.principal_amount * (loan.interest_rate / 100);
+  const interestAlreadyPaid = Math.max(0, totalPaidBefore - loan.principal_amount);
+  const maxInterestRemaining = Math.max(0, totalInterest - interestAlreadyPaid);
+
+  return Math.min(interestPortion, maxInterestRemaining);
 }
 
 // GET /api/dashboard/chart - Get chart data for the dashboard

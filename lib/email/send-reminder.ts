@@ -16,6 +16,8 @@ export interface SendReminderParams {
   lenderName: string;
   principalAmount: number;
   interestRate: number;
+  isFixedInterest?: boolean;
+  fixedInterestAmount?: number;
   dueDate: string;
   currency: CurrencyCode;
   daysUntilDue?: number;
@@ -38,6 +40,8 @@ export async function sendReminder(params: SendReminderParams): Promise<SendRemi
     lenderName,
     principalAmount,
     interestRate,
+    isFixedInterest = false,
+    fixedInterestAmount = 0,
     dueDate,
     currency,
     daysUntilDue,
@@ -47,7 +51,9 @@ export async function sendReminder(params: SendReminderParams): Promise<SendRemi
   } = params;
 
   // Calculate total amount with interest
-  const totalAmount = principalAmount * (1 + interestRate / 100);
+  const totalAmount = isFixedInterest
+    ? principalAmount + fixedInterestAmount
+    : principalAmount * (1 + interestRate / 100);
 
   // Prepare loan data
   const loanData: LoanReminderData = {
@@ -55,6 +61,8 @@ export async function sendReminder(params: SendReminderParams): Promise<SendRemi
     lenderName,
     principalAmount,
     interestRate,
+    isFixedInterest,
+    fixedInterestAmount,
     totalAmount,
     dueDate,
     currency,

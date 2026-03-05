@@ -126,8 +126,17 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onEdit, onDelete }) => {
               <div className="flex items-center gap-3">
                 <Percent className="h-4 w-4 text-muted-foreground" />
                 <div>
-                  <span className="text-sm text-muted-foreground">Interest Rate: </span>
-                  <span className="text-sm font-medium">{loan.interest_rate}%</span>
+                  {loan.is_fixed_interest ? (
+                    <>
+                      <span className="text-sm text-muted-foreground">Fixed Interest: </span>
+                      <span className="text-sm font-medium">{formatCurrency(loan.fixed_interest_amount, loan.currency)}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-sm text-muted-foreground">Interest Rate: </span>
+                      <span className="text-sm font-medium">{loan.interest_rate}%</span>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-3">

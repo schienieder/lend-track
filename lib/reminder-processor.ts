@@ -22,6 +22,8 @@ interface LoanWithUser {
   lender_name: string;
   principal_amount: number;
   interest_rate: number;
+  is_fixed_interest: boolean;
+  fixed_interest_amount: number;
   currency: CurrencyCode;
   due_date: string;
   status: string;
@@ -194,6 +196,8 @@ export async function processReminders(): Promise<ProcessResult> {
           lender_name,
           principal_amount,
           interest_rate,
+          is_fixed_interest,
+          fixed_interest_amount,
           currency,
           due_date,
           status,
@@ -253,6 +257,8 @@ export async function processReminders(): Promise<ProcessResult> {
         lenderName: loan.lender_name,
         principalAmount: loan.principal_amount,
         interestRate: loan.interest_rate,
+        isFixedInterest: loan.is_fixed_interest,
+        fixedInterestAmount: loan.fixed_interest_amount,
         dueDate: loan.due_date,
         currency: loan.currency,
         daysUntilDue,

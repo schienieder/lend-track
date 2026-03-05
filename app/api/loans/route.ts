@@ -126,6 +126,8 @@ export async function POST(request: NextRequest) {
         lenderName: loan.lender_name,
         principalAmount: loan.principal_amount,
         interestRate: loan.interest_rate,
+        isFixedInterest: loan.is_fixed_interest,
+        fixedInterestAmount: loan.fixed_interest_amount,
         dueDate: loan.due_date,
         currency: loan.currency,
         paymentSchedule: loan.payment_schedule,

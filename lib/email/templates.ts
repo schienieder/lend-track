@@ -5,6 +5,8 @@ export interface LoanReminderData {
   lenderName: string;
   principalAmount: number;
   interestRate: number;
+  isFixedInterest?: boolean;
+  fixedInterestAmount?: number;
   totalAmount: number;
   dueDate: string;
   currency: CurrencyCode;
@@ -19,6 +21,26 @@ function formatDate(dateString: string): string {
     month: 'long',
     day: 'numeric',
   });
+}
+
+function interestRowHtml(data: LoanReminderData): string {
+  if (data.isFixedInterest) {
+    return `<tr>
+                  <td style="padding: 8px 0; font-weight: 600; color: #666;">Interest Amount</td>
+                  <td style="padding: 8px 0; text-align: right; color: #333;">${formatCurrency(data.fixedInterestAmount || 0, data.currency)}</td>
+                </tr>`;
+  }
+  return `<tr>
+                  <td style="padding: 8px 0; font-weight: 600; color: #666;">Interest Rate</td>
+                  <td style="padding: 8px 0; text-align: right; color: #333;">${data.interestRate}%</td>
+                </tr>`;
+}
+
+function interestRowText(data: LoanReminderData): string {
+  if (data.isFixedInterest) {
+    return `- Interest Amount: ${formatCurrency(data.fixedInterestAmount || 0, data.currency)}`;
+  }
+  return `- Interest Rate: ${data.interestRate}%`;
 }
 
 const baseStyles = `
@@ -193,7 +215,7 @@ const emailFooter = `
 `;
 
 export function getDueDateReminderTemplate(data: LoanReminderData): { subject: string; html: string; text: string } {
-  const { borrowerName, lenderName, principalAmount, interestRate, totalAmount, dueDate, currency, daysUntilDue } = data;
+  const { borrowerName, lenderName, principalAmount, totalAmount, dueDate, currency, daysUntilDue } = data;
 
   const subject = daysUntilDue === 1
     ? `Payment Reminder: Your loan payment is due tomorrow`
@@ -227,10 +249,7 @@ export function getDueDateReminderTemplate(data: LoanReminderData): { subject: s
                   <td style="padding: 8px 0; font-weight: 600; color: #666;">Principal Amount</td>
                   <td style="padding: 8px 0; text-align: right; color: #333;">${formatCurrency(principalAmount, currency)}</td>
                 </tr>
-                <tr>
-                  <td style="padding: 8px 0; font-weight: 600; color: #666;">Interest Rate</td>
-                  <td style="padding: 8px 0; text-align: right; color: #333;">${interestRate}%</td>
-                </tr>
+                ${interestRowHtml(data)}
                 <tr>
                   <td style="padding: 8px 0; font-weight: 600; color: #666;">Due Date</td>
                   <td style="padding: 8px 0; text-align: right; color: #333;">${formatDate(dueDate)}</td>
@@ -277,7 +296,7 @@ This is a friendly reminder that your loan payment to ${lenderName} is due ${day
 
 Loan Details:
 - Principal Amount: ${formatCurrency(principalAmount, currency)}
-- Interest Rate: ${interestRate}%
+${interestRowText(data)}
 - Due Date: ${formatDate(dueDate)}
 - Total Amount Due: ${formatCurrency(totalAmount, currency)}
 
@@ -291,7 +310,7 @@ LendTrack Team
 }
 
 export function getOverdueReminderTemplate(data: LoanReminderData): { subject: string; html: string; text: string } {
-  const { borrowerName, lenderName, principalAmount, interestRate, totalAmount, dueDate, currency, daysOverdue } = data;
+  const { borrowerName, lenderName, principalAmount, totalAmount, dueDate, currency, daysOverdue } = data;
 
   const subject = daysOverdue === 1
     ? `Urgent: Your loan payment is 1 day overdue`
@@ -329,10 +348,7 @@ export function getOverdueReminderTemplate(data: LoanReminderData): { subject: s
                   <td style="padding: 8px 0; font-weight: 600; color: #666;">Principal Amount</td>
                   <td style="padding: 8px 0; text-align: right; color: #333;">${formatCurrency(principalAmount, currency)}</td>
                 </tr>
-                <tr>
-                  <td style="padding: 8px 0; font-weight: 600; color: #666;">Interest Rate</td>
-                  <td style="padding: 8px 0; text-align: right; color: #333;">${interestRate}%</td>
-                </tr>
+                ${interestRowHtml(data)}
                 <tr>
                   <td style="padding: 8px 0; font-weight: 600; color: #666;">Original Due Date</td>
                   <td style="padding: 8px 0; text-align: right; color: #333;">${formatDate(dueDate)}</td>
@@ -379,7 +395,7 @@ We urge you to make your payment as soon as possible to avoid additional late fe
 
 Loan Details:
 - Principal Amount: ${formatCurrency(principalAmount, currency)}
-- Interest Rate: ${interestRate}%
+${interestRowText(data)}
 - Original Due Date: ${formatDate(dueDate)}
 - Days Overdue: ${daysOverdue} ${daysOverdue === 1 ? 'day' : 'days'}
 - Total Amount Due: ${formatCurrency(totalAmount, currency)}
@@ -394,7 +410,7 @@ LendTrack Team
 }
 
 export function getLoanCreatedTemplate(data: LoanReminderData & { paymentSchedule: string }): { subject: string; html: string; text: string } {
-  const { borrowerName, lenderName, principalAmount, interestRate, totalAmount, dueDate, currency, paymentSchedule } = data;
+  const { borrowerName, lenderName, principalAmount, totalAmount, dueDate, currency, paymentSchedule } = data;
 
   const subject = `Loan Created: Your loan details from ${lenderName}`;
 
@@ -437,10 +453,7 @@ export function getLoanCreatedTemplate(data: LoanReminderData & { paymentSchedul
                   <td style="padding: 8px 0; font-weight: 600; color: #666;">Principal Amount</td>
                   <td style="padding: 8px 0; text-align: right; color: #333;">${formatCurrency(principalAmount, currency)}</td>
                 </tr>
-                <tr>
-                  <td style="padding: 8px 0; font-weight: 600; color: #666;">Interest Rate</td>
-                  <td style="padding: 8px 0; text-align: right; color: #333;">${interestRate}%</td>
-                </tr>
+                ${interestRowHtml(data)}
                 <tr>
                   <td style="padding: 8px 0; font-weight: 600; color: #666;">Payment Schedule</td>
                   <td style="padding: 8px 0; text-align: right; color: #333;">${formatPaymentSchedule(paymentSchedule)}</td>
@@ -487,7 +500,7 @@ A new loan has been created for you by ${lenderName}. Below are the details of y
 
 Loan Details:
 - Principal Amount: ${formatCurrency(principalAmount, currency)}
-- Interest Rate: ${interestRate}%
+${interestRowText(data)}
 - Payment Schedule: ${formatPaymentSchedule(paymentSchedule)}
 - Due Date: ${formatDate(dueDate)}
 - Total Amount Due: ${formatCurrency(totalAmount, currency)}
@@ -504,7 +517,7 @@ LendTrack Team
 }
 
 export function getCustomReminderTemplate(data: LoanReminderData & { customMessage?: string }): { subject: string; html: string; text: string } {
-  const { borrowerName, lenderName, principalAmount, interestRate, totalAmount, dueDate, currency, customMessage } = data;
+  const { borrowerName, lenderName, principalAmount, totalAmount, dueDate, currency, customMessage } = data;
 
   const subject = `Loan Reminder from ${lenderName}`;
 
@@ -534,10 +547,7 @@ export function getCustomReminderTemplate(data: LoanReminderData & { customMessa
                   <td style="padding: 8px 0; font-weight: 600; color: #666;">Principal Amount</td>
                   <td style="padding: 8px 0; text-align: right; color: #333;">${formatCurrency(principalAmount, currency)}</td>
                 </tr>
-                <tr>
-                  <td style="padding: 8px 0; font-weight: 600; color: #666;">Interest Rate</td>
-                  <td style="padding: 8px 0; text-align: right; color: #333;">${interestRate}%</td>
-                </tr>
+                ${interestRowHtml(data)}
                 <tr>
                   <td style="padding: 8px 0; font-weight: 600; color: #666;">Due Date</td>
                   <td style="padding: 8px 0; text-align: right; color: #333;">${formatDate(dueDate)}</td>
@@ -576,7 +586,7 @@ ${customMessage || `This is a reminder regarding your loan with ${lenderName}.`}
 
 Loan Details:
 - Principal Amount: ${formatCurrency(principalAmount, currency)}
-- Interest Rate: ${interestRate}%
+${interestRowText(data)}
 - Due Date: ${formatDate(dueDate)}
 - Total Amount: ${formatCurrency(totalAmount, currency)}
 

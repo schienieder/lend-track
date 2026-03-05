@@ -36,6 +36,12 @@ export const createLoanSchema = z.object({
     .number()
     .min(0, 'Interest rate cannot be negative')
     .max(100, 'Interest rate cannot exceed 100%'),
+  is_fixed_interest: z.boolean().optional().default(false),
+  fixed_interest_amount: z
+    .number()
+    .min(0, 'Fixed interest amount cannot be negative')
+    .optional()
+    .default(0),
   due_date: z
     .string()
     .min(1, 'Due date is required')
@@ -85,6 +91,11 @@ export const updateLoanSchema = z.object({
     .number()
     .min(0, 'Interest rate cannot be negative')
     .max(100, 'Interest rate cannot exceed 100%')
+    .optional(),
+  is_fixed_interest: z.boolean().optional(),
+  fixed_interest_amount: z
+    .number()
+    .min(0, 'Fixed interest amount cannot be negative')
     .optional(),
   due_date: z
     .string()
@@ -142,6 +153,10 @@ export const loanFormSchema = z.object({
     .number()
     .min(0, 'Interest rate cannot be negative')
     .max(100, 'Interest rate cannot exceed 100%'),
+  is_fixed_interest: z.boolean(),
+  fixed_interest_amount: z
+    .number()
+    .min(0, 'Fixed interest amount cannot be negative'),
   due_date: z
     .string()
     .min(1, 'Due date is required'),

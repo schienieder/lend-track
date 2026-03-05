@@ -22,7 +22,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Verify the loan exists and belongs to the user
     const { data: loan, error: loanError } = await supabase
       .from('loans')
-      .select('id, principal_amount, interest_rate')
+      .select('id, principal_amount, interest_rate, is_fixed_interest, fixed_interest_amount')
       .eq('id', loanId)
       .eq('user_id', user.id)
       .single();
@@ -76,7 +76,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     const totalPaid = sumData?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
-    const totalWithInterest = loan.principal_amount * (1 + loan.interest_rate / 100);
+    const totalWithInterest = loan.is_fixed_interest
+      ? loan.principal_amount + (loan.fixed_interest_amount || 0)
+      : loan.principal_amount * (1 + loan.interest_rate / 100);
     const remainingBalance = Math.max(0, totalWithInterest - totalPaid);
 
     const total = count || 0;
