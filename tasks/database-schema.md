@@ -1,7 +1,7 @@
-# LendTrack - Database Schema Design
+# HuramTrack - Database Schema Design
 
 ## Overview
-This document outlines the database schema for the LendTrack application. The schema is designed to efficiently store and manage loan information, user data, payment records, and reminder settings.
+This document outlines the database schema for the HuramTrack application. The schema is designed to efficiently store and manage loan information, user data, payment records, and reminder settings.
 
 ## Database Technology
 - **Database**: PostgreSQL (via Supabase)

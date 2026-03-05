@@ -180,10 +180,10 @@ const emailHeader = `
     <table cellpadding="0" cellspacing="0" border="0" style="height: 40px;">
       <tr>
         <td style="vertical-align: middle; line-height: 0;">
-          <img src="${logoUrl}" alt="LendTrack Logo" style="width: 32px; height: 32px; display: block; vertical-align: middle;" />
+          <img src="${logoUrl}" alt="HuramTrack Logo" style="width: 32px; height: 32px; display: block; vertical-align: middle;" />
         </td>
         <td style="vertical-align: middle; padding-left: 10px; line-height: 1;">
-          <span style="font-size: 20px; font-weight: bold; color: #333; vertical-align: middle;">LendTrack</span>
+          <span style="font-size: 20px; font-weight: bold; color: #333; vertical-align: middle;">HuramTrack</span>
         </td>
       </tr>
     </table>
@@ -195,16 +195,16 @@ const emailFooter = `
     <table width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
         <td style="color: #ffffff; font-size: 12px; vertical-align: middle;">
-          &copy; ${new Date().getFullYear()} LendTrack. All Rights Reserved
+          &copy; ${new Date().getFullYear()} HuramTrack. All Rights Reserved
         </td>
         <td style="text-align: right; vertical-align: middle;">
           <table cellpadding="0" cellspacing="0" border="0" align="right" style="height: 32px;">
             <tr>
               <td style="vertical-align: middle; line-height: 0;">
-                <img src="${logoUrl}" alt="LendTrack Logo" style="width: 32px; height: 32px; display: block; vertical-align: middle;" />
+                <img src="${logoUrl}" alt="HuramTrack Logo" style="width: 32px; height: 32px; display: block; vertical-align: middle;" />
               </td>
               <td style="vertical-align: middle; padding-left: 10px; line-height: 1;">
-                <span style="color: #ffffff; font-size: 20px; font-weight: bold; vertical-align: middle;">LendTrack</span>
+                <span style="color: #ffffff; font-size: 20px; font-weight: bold; vertical-align: middle;">HuramTrack</span>
               </td>
             </tr>
           </table>
@@ -271,10 +271,10 @@ export function getDueDateReminderTemplate(data: LoanReminderData): { subject: s
 
             <div class="closing-remarks" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
               <p style="margin: 0 0 5px 0;">Best regards,</p>
-              <p style="margin: 0; font-weight: 600;">LendTrack Team</p>
+              <p style="margin: 0; font-weight: 600;">HuramTrack Team</p>
 
               <div class="automated-notice" style="margin-top: 20px; padding-top: 20px; font-size: 13px; color: #888;">
-                <p style="margin: 0 0 5px 0;">This is an automated reminder from <a href="https://lend-track.vercel.app/" style="color: #059669; text-decoration: none; font-weight: bold;">LendTrack</a>.</p>
+                <p style="margin: 0 0 5px 0;">This is an automated reminder from <a href="https://huram-track.vercel.app/" style="color: #059669; text-decoration: none; font-weight: bold;">HuramTrack</a>.</p>
                 <p style="margin: 0;">If you have any questions, please contact your lender directly.</p>
               </div>
             </div>
@@ -303,7 +303,7 @@ ${interestRowText(data)}
 If you have already made this payment, please disregard this reminder.
 
 Best regards,
-LendTrack Team
+HuramTrack Team
   `.trim();
 
   return { subject, html, text };
@@ -368,10 +368,10 @@ export function getOverdueReminderTemplate(data: LoanReminderData): { subject: s
 
             <div class="closing-remarks" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
               <p style="margin: 0 0 5px 0;">Best regards,</p>
-              <p style="margin: 0; font-weight: 600;">LendTrack Team</p>
+              <p style="margin: 0; font-weight: 600;">HuramTrack Team</p>
 
               <div class="automated-notice" style="margin-top: 20px; padding-top: 20px; font-size: 13px; color: #888;">
-                <p style="margin: 0 0 5px 0;">This is an automated reminder from <a href="https://lend-track.vercel.app/" style="color: #059669; text-decoration: none; font-weight: bold;">LendTrack</a>.</p>
+                <p style="margin: 0 0 5px 0;">This is an automated reminder from <a href="https://huram-track.vercel.app/" style="color: #059669; text-decoration: none; font-weight: bold;">HuramTrack</a>.</p>
                 <p style="margin: 0;">If you have any questions, please contact your lender directly.</p>
               </div>
             </div>
@@ -403,7 +403,7 @@ ${interestRowText(data)}
 If you have already made this payment, please disregard this notice.
 
 Best regards,
-LendTrack Team
+HuramTrack Team
   `.trim();
 
   return { subject, html, text };
@@ -475,10 +475,10 @@ export function getLoanCreatedTemplate(data: LoanReminderData & { paymentSchedul
 
             <div class="closing-remarks" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
               <p style="margin: 0 0 5px 0;">Best regards,</p>
-              <p style="margin: 0; font-weight: 600;">LendTrack Team</p>
+              <p style="margin: 0; font-weight: 600;">HuramTrack Team</p>
 
               <div class="automated-notice" style="margin-top: 20px; padding-top: 20px; font-size: 13px; color: #888;">
-                <p style="margin: 0 0 5px 0;">This is an automated notification from <a href="https://lend-track.vercel.app/" style="color: #059669; text-decoration: none; font-weight: bold;">LendTrack</a>.</p>
+                <p style="margin: 0 0 5px 0;">This is an automated notification from <a href="https://huram-track.vercel.app/" style="color: #059669; text-decoration: none; font-weight: bold;">HuramTrack</a>.</p>
                 <p style="margin: 0;">If you have any questions, please contact your lender directly.</p>
               </div>
             </div>
@@ -510,7 +510,7 @@ Please ensure your payment is made by the due date to avoid any late fees or pen
 If you have any questions about this loan, please contact your lender directly.
 
 Best regards,
-LendTrack Team
+HuramTrack Team
   `.trim();
 
   return { subject, html, text };
@@ -561,10 +561,10 @@ export function getCustomReminderTemplate(data: LoanReminderData & { customMessa
 
             <div class="closing-remarks" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
               <p style="margin: 0 0 5px 0;">Best regards,</p>
-              <p style="margin: 0; font-weight: 600;">LendTrack Team</p>
+              <p style="margin: 0; font-weight: 600;">HuramTrack Team</p>
 
               <div class="automated-notice" style="margin-top: 20px; padding-top: 20px; font-size: 13px; color: #888;">
-                <p style="margin: 0 0 5px 0;">This is an automated reminder from <a href="https://lend-track.vercel.app/" style="color: #059669; text-decoration: none; font-weight: bold;">LendTrack</a>.</p>
+                <p style="margin: 0 0 5px 0;">This is an automated reminder from <a href="https://huram-track.vercel.app/" style="color: #059669; text-decoration: none; font-weight: bold;">HuramTrack</a>.</p>
                 <p style="margin: 0;">If you have any questions, please contact your lender directly.</p>
               </div>
             </div>
@@ -591,7 +591,7 @@ ${interestRowText(data)}
 - Total Amount: ${formatCurrency(totalAmount, currency)}
 
 Best regards,
-LendTrack Team
+HuramTrack Team
   `.trim();
 
   return { subject, html, text };

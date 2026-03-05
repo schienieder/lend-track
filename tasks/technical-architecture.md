@@ -1,10 +1,10 @@
-# LendTrack - Technical Architecture Document
+# HuramTrack - Technical Architecture Document
 
 ## Overview
-This document outlines the technical architecture for LendTrack, a web application system that tracks lended amounts, due dates, interest rates, and other financial details. The application will be built using a modern tech stack to ensure scalability, security, and maintainability.
+This document outlines the technical architecture for HuramTrack, a web application system that tracks lended amounts, due dates, interest rates, and other financial details. The application will be built using a modern tech stack to ensure scalability, security, and maintainability.
 
 ## Architecture Overview
-LendTrack follows a client-server architecture with the following layers:
+HuramTrack follows a client-server architecture with the following layers:
 - **Presentation Layer**: Next.js frontend with responsive UI
 - **Application Layer**: Next.js API routes for business logic
 - **Data Layer**: Supabase (PostgreSQL) for data storage

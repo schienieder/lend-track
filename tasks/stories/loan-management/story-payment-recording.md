@@ -1,7 +1,7 @@
-# LendTrack - User Story: Payment Recording and Management
+# HuramTrack - User Story: Payment Recording and Management
 
 ## Feature: Payment Management
-**As a** user of LendTrack  
+**As a** user of HuramTrack  
 **I want** to record payments received from borrowers  
 **So that** I can track repayment progress and update loan balances accurately
 

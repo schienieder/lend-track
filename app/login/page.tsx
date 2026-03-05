@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Login',
-  description: 'This is the login page for LendTrack application. You can also toggle to the registration form if you do not have an account yet.',
+  description: 'This is the login page for HuramTrack application. You can also toggle to the registration form if you do not have an account yet.',
 };
 
 const AuthPage: React.FC = () => {

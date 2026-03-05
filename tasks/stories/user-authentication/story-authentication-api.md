@@ -1,7 +1,7 @@
-# LendTrack - User Story: Authentication API
+# HuramTrack - User Story: Authentication API
 
 ## Feature: Authentication API
-**As a** developer implementing the LendTrack frontend  
+**As a** developer implementing the HuramTrack frontend  
 **I want** a secure and reliable authentication API using Supabase  
 **So that** I can implement user registration, login, and session management functionality
 

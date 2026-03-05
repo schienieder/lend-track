@@ -33,12 +33,12 @@ const LoginPageView = () => {
         <div className="relative min-h-screen w-full bg-background font-sans overflow-hidden">
             <Link href="/" className="top-6 left-6 absolute flex items-center gap-2">
                 <Image
-                    src="/images/lend-track-logo.png"
-                    alt="LendTrack Logo"
+                    src="/images/huram-track-logo.png"
+                    alt="HuramTrack Logo"
                     width={32}
                     height={32}
                 />
-                <span className="text-xl font-bold text-foreground">LendTrack</span>
+                <span className="text-xl font-bold text-foreground">HuramTrack</span>
             </Link>
             <div className="flex items-center justify-center min-h-screen px-4">
                 {isLoginView ? (

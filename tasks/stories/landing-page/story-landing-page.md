@@ -1,7 +1,7 @@
-# LendTrack - User Story: Landing Page
+# HuramTrack - User Story: Landing Page
 
 ## Feature: Landing Page
-**As a** potential user visiting LendTrack  
+**As a** potential user visiting HuramTrack  
 **I want** to see a minimalist but eye-catching landing page  
 **So that** I can quickly understand the value proposition and be encouraged to sign up
 
@@ -9,21 +9,21 @@
 
 ### Hero Section
 - [ ] Clean, minimalist design with ample white space
-- [ ] Prominent display of the LendTrack logo from /public/images/lend-track-logo.png
+- [ ] Prominent display of the HuramTrack logo from /public/images/huram-track-logo.png
 - [ ] Clear, compelling headline that explains the value proposition
-- [ ] Subheadline that briefly describes what LendTrack does
+- [ ] Subheadline that briefly describes what HuramTrack does
 - [ ] Primary call-to-action button (e.g., "Get Started" or "Sign Up")
 - [ ] Secondary call-to-action button (e.g., "Learn More")
 - [ ] Background that complements the logo and brand colors
 
 ### Value Proposition Section
-- [ ] Clear explanation of the main benefits of using LendTrack
+- [ ] Clear explanation of the main benefits of using HuramTrack
 - [ ] Three key features presented with icons or visual elements
 - [ ] Minimal text with strong visual hierarchy
 - [ ] Consistent design language with the rest of the application
 
 ### How It Works Section
-- [ ] Simple 3-step process explaining how to use LendTrack
+- [ ] Simple 3-step process explaining how to use HuramTrack
 - [ ] Visual elements or illustrations to support each step
 - [ ] Concise, action-oriented descriptions
 - [ ] Consistent styling with the overall minimalist aesthetic
@@ -67,7 +67,7 @@
 ## Technical Implementation Notes
 - Use Tailwind CSS for consistent styling following modern design principles
 - Implement Next.js best practices for performance
-- Use the logo from /public/images/lend-track-logo.png
+- Use the logo from /public/images/huram-track-logo.png
 - Follow modern design principles: minimalism, ample white space, clear typography
 - Implement proper SEO meta tags and structured data
 - Use modern CSS features like CSS Grid and Flexbox for layouts

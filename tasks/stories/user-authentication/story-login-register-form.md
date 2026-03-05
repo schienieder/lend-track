@@ -1,7 +1,7 @@
-# LendTrack - User Story: Login and Registration Form
+# HuramTrack - User Story: Login and Registration Form
 
 ## Feature: User Authentication
-**As a** new or existing user of LendTrack  
+**As a** new or existing user of HuramTrack  
 **I want** to be able to register for an account or log in to my existing account  
 **So that** I can securely access my loan tracking dashboard and manage my financial information
 

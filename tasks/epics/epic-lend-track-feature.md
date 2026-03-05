@@ -1,7 +1,7 @@
-# LendTrack - Project Requirements Document
+# HuramTrack - Project Requirements Document
 
 ## Project Overview
-LendTrack is a web application system that tracks lended amounts, due dates, interest rates, and other financial details. The application features secure user authentication, automated reminders, and comprehensive reporting tools to help manage personal and business loans efficiently.
+HuramTrack is a web application system that tracks lended amounts, due dates, interest rates, and other financial details. The application features secure user authentication, automated reminders, and comprehensive reporting tools to help manage personal and business loans efficiently.
 
 **Project Type:** FinTech Application  
 **Target Users:** Individuals and small business owners managing personal loans  

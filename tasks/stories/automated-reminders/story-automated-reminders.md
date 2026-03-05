@@ -1,7 +1,7 @@
-# LendTrack - User Story: Automated Reminders
+# HuramTrack - User Story: Automated Reminders
 
 ## Feature: Automated Reminders
-**As a** user of LendTrack  
+**As a** user of HuramTrack  
 **I want** to receive automated reminders for upcoming and overdue loans  
 **So that** I can stay on top of my lending activities and follow up with borrowers in a timely manner
 

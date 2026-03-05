@@ -1,7 +1,7 @@
-# LendTrack - User Story: Loan Creation and Management
+# HuramTrack - User Story: Loan Creation and Management
 
 ## Feature: Loan Management
-**As a** user of LendTrack  
+**As a** user of HuramTrack  
 **I want** to create, view, update, and delete loan records  
 **So that** I can effectively track and manage my lending activities
 

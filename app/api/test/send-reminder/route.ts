@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     currency,
     daysUntilDue: reminderType === 'due_date' ? 3 : undefined,
     daysOverdue: reminderType === 'overdue' ? 5 : undefined,
-    customMessage: reminderType === 'custom' ? 'This is a test custom reminder message from LendTrack.' : undefined,
+    customMessage: reminderType === 'custom' ? 'This is a test custom reminder message from HuramTrack.' : undefined,
   };
 
   try {

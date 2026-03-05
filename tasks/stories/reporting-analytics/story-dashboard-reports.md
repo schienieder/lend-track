@@ -1,7 +1,7 @@
-# LendTrack - User Story: Reporting and Analytics Dashboard
+# HuramTrack - User Story: Reporting and Analytics Dashboard
 
 ## Feature: Reporting and Analytics
-**As a** user of LendTrack  
+**As a** user of HuramTrack  
 **I want** to view comprehensive reports and analytics about my loans  
 **So that** I can understand my lending portfolio, track performance, and make informed decisions
 

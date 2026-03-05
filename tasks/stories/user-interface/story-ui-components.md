@@ -1,7 +1,7 @@
-# LendTrack - User Story: User Interface Components
+# HuramTrack - User Story: User Interface Components
 
 ## Feature: User Interface Components
-**As a** user of LendTrack  
+**As a** user of HuramTrack  
 **I want** an intuitive, responsive, and visually appealing interface  
 **So that** I can efficiently manage my loans and access information easily
 

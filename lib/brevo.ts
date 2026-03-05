@@ -11,8 +11,8 @@ apiInstance.setApiKey(
 
 // Sender configuration
 export const EMAIL_SENDER = {
-  email: process.env.BREVO_SENDER_EMAIL || 'noreply@lendtrack.app',
-  name: process.env.BREVO_SENDER_NAME || 'LendTrack',
+  email: process.env.BREVO_SENDER_EMAIL || 'noreply@huramtrack.app',
+  name: process.env.BREVO_SENDER_NAME || 'HuramTrack',
 };
 
 export interface SendEmailParams {

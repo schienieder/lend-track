@@ -29,7 +29,7 @@ export async function sendEmailViaSMTP(
     const transporter = createTransporter();
 
     const info = await transporter.sendMail({
-      from: `"LendTrack" <${process.env.SMTP_USERNAME}>`,
+      from: `"HuramTrack" <${process.env.SMTP_USERNAME}>`,
       to: to.name ? `"${to.name}" <${to.email}>` : to.email,
       subject,
       html: htmlContent,

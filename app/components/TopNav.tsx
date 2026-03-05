@@ -29,12 +29,12 @@ export default function TopNav() {
     <nav className="absolute top-0 left-0 right-0 z-50 py-4 px-6 flex justify-between items-center">
       <Link href={user ? '/dashboard' : '/'} className="flex items-center gap-2">
         <Image
-          src="/images/lend-track-logo.png"
-          alt="LendTrack Logo"
+          src="/images/huram-track-logo.png"
+          alt="HuramTrack Logo"
           width={32}
           height={32}
         />
-        <span className="text-xl font-bold text-foreground hidden sm:block">LendTrack</span>
+        <span className="text-xl font-bold text-foreground hidden sm:block">HuramTrack</span>
       </Link>
 
       <div className="flex items-center gap-3">

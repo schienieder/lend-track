@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteTitle = 'LendTrack';
-const siteDescription = 'Welcome to LendTrack - LendTrack is a web application system that tracks lended amounts, due dates, interest rates, and other financial details. The application features secure user authentication, automated reminders, and comprehensive reporting tools to help manage personal and business loans efficiently.';
+const siteTitle = 'HuramTrack';
+const siteDescription = 'Welcome to HuramTrack - HuramTrack is a web application system that tracks lended amounts, due dates, interest rates, and other financial details. The application features secure user authentication, automated reminders, and comprehensive reporting tools to help manage personal and business loans efficiently.';
 
 export const metadata: Metadata = {
   title: {
@@ -26,18 +26,18 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.ico',
     shortcut: '/images/favicon-16x16.ico',
-    apple: '/images/lend-track-logo.png',
+    apple: '/images/huram-track-logo.png',
   },
   openGraph: {
     title: siteTitle,
     description: siteDescription,
-    images: ['/images/lend-track-logo.png'],
+    images: ['/images/huram-track-logo.png'],
   },
   twitter: {
     card: 'summary_large_image',
     title: siteTitle,
     description: siteDescription,
-    images: ['/images/lend-track-logo.png'],
+    images: ['/images/huram-track-logo.png'],
   },
 };
 
