@@ -83,7 +83,7 @@ export async function generateReminders(): Promise<ProcessResult> {
       const configArray = loan.reminder_configs as ReminderConfig[] | null;
       const config = configArray?.[0] || {
         enabled: true,
-        due_date_days_before: [7, 3, 1],
+        due_date_days_before: [7, 3, 1, 0],
         overdue_days_after: [1, 7, 14],
       };
 
