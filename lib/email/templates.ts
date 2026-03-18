@@ -217,11 +217,13 @@ const emailFooter = `
 export function getDueDateReminderTemplate(data: LoanReminderData): { subject: string; html: string; text: string } {
   const { borrowerName, lenderName, principalAmount, totalAmount, dueDate, currency, daysUntilDue } = data;
 
-  const subject = daysUntilDue === 1
+  const subject = daysUntilDue === 0
+    ? `Payment Reminder: Your loan payment is due today`
+    : daysUntilDue === 1
     ? `Payment Reminder: Your loan payment is due tomorrow`
     : `Payment Reminder: Your loan payment is due in ${daysUntilDue} days`;
 
-  const subjectLine = daysUntilDue === 1 ? 'Payment Due Tomorrow' : `Payment Due in ${daysUntilDue} Days`;
+  const subjectLine = daysUntilDue === 0 ? 'Payment Due Today' : daysUntilDue === 1 ? 'Payment Due Tomorrow' : `Payment Due in ${daysUntilDue} Days`;
 
   const html = `
     <!DOCTYPE html>
@@ -241,7 +243,7 @@ export function getDueDateReminderTemplate(data: LoanReminderData): { subject: s
           <div class="content" style="padding: 30px; line-height: 1.6; color: #333;">
             <p style="margin: 0 0 15px 0;">Dear ${borrowerName},</p>
 
-            <p style="margin: 0 0 15px 0;">This is a friendly reminder that your loan payment to <strong>${lenderName}</strong> is due ${daysUntilDue === 1 ? 'tomorrow' : `in <strong>${daysUntilDue} days</strong>`}.</p>
+            <p style="margin: 0 0 15px 0;">This is a friendly reminder that your loan payment to <strong>${lenderName}</strong> is due ${daysUntilDue === 0 ? '<strong>today</strong>' : daysUntilDue === 1 ? 'tomorrow' : `in <strong>${daysUntilDue} days</strong>`}.</p>
 
             <div class="loan-details" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
               <table style="width: 100%; border-collapse: collapse;">
@@ -261,7 +263,7 @@ export function getDueDateReminderTemplate(data: LoanReminderData): { subject: s
               Total Amount Due: ${formatCurrency(totalAmount, currency)}
             </div>
 
-            ${daysUntilDue && daysUntilDue <= 3 ? `
+            ${daysUntilDue !== undefined && daysUntilDue <= 3 ? `
             <div class="warning" style="background: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 15px; border-radius: 8px; margin: 20px 0;">
               <strong>Reminder:</strong> Please ensure your payment is made on time to avoid any late fees or penalties.
             </div>
@@ -292,7 +294,7 @@ Payment Reminder
 
 Dear ${borrowerName},
 
-This is a friendly reminder that your loan payment to ${lenderName} is due ${daysUntilDue === 1 ? 'tomorrow' : `in ${daysUntilDue} days`}.
+This is a friendly reminder that your loan payment to ${lenderName} is due ${daysUntilDue === 0 ? 'today' : daysUntilDue === 1 ? 'tomorrow' : `in ${daysUntilDue} days`}.
 
 Loan Details:
 - Principal Amount: ${formatCurrency(principalAmount, currency)}
