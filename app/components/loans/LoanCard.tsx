@@ -46,7 +46,7 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, onEdit, onDelete }) => {
   return (
     <Card>
       <CardHeader className="border-b">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <CardTitle className="text-2xl">{loan.borrower_name}</CardTitle>
             <div className="mt-2">

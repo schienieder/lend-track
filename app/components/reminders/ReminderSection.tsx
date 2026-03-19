@@ -138,17 +138,17 @@ const ReminderSection: React.FC<ReminderSectionProps> = ({ loanId, loanDueDate, 
       {/* Monthly Reminder Status */}
       {isMonthly && (
         <Card>
-          <CardContent className="flex items-center justify-between py-4">
+          <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <CalendarClock className="h-5 w-5 shrink-0 text-muted-foreground" />
-              <div>
-                <p className="font-medium">Monthly Recurring Reminder</p>
+              <CalendarClock className="hidden sm:block h-5 w-5 shrink-0 text-muted-foreground" />
+              <div className="min-w-0">
+                <p className="font-medium text-sm sm:text-base">Monthly Recurring Reminder</p>
                 {hasMonthlyReminder ? (
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     Reminder sent on the <span className="font-medium text-foreground">{formatReminderDay(reminderConfig.monthly_reminder_day!)}</span> of every month
                   </p>
                 ) : (
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     No monthly recurring reminder configured
                   </p>
                 )}
@@ -217,18 +217,19 @@ const ReminderSection: React.FC<ReminderSectionProps> = ({ loanId, loanDueDate, 
 
       {/* Reminder History */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <CardHeader className="flex flex-col gap-3 pb-4 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle className="text-lg font-medium">Reminder History</CardTitle>
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full sm:w-auto">
             <Button
               onClick={() => setSendDialogOpen(true)}
               size="sm"
               disabled={!borrowerEmail}
+              className="flex-1 sm:flex-none"
             >
               <Send className="mr-2 h-4 w-4" />
               Send Now
             </Button>
-            <Button onClick={() => setConfigDialogOpen(true)} size="sm" variant="outline">
+            <Button onClick={() => setConfigDialogOpen(true)} size="sm" variant="outline" className="flex-1 sm:flex-none">
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </Button>

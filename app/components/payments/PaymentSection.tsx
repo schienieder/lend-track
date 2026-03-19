@@ -90,9 +90,9 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({ loan }) => {
 
       {/* Payment History */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <CardHeader className="flex flex-col gap-3 pb-4 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle className="text-lg font-medium">Payment History</CardTitle>
-          <Button onClick={() => setCreateDialogOpen(true)} size="sm">
+          <Button onClick={() => setCreateDialogOpen(true)} size="sm" className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             Record Payment
           </Button>
