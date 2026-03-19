@@ -39,6 +39,8 @@ export interface ReminderConfig {
   enabled: boolean;
   due_date_days_before: number[];
   overdue_days_after: number[];
+  monthly_reminder_enabled: boolean;
+  monthly_reminder_day: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -54,6 +56,8 @@ export interface UpdateReminderConfigInput {
   enabled?: boolean;
   due_date_days_before?: number[];
   overdue_days_after?: number[];
+  monthly_reminder_enabled?: boolean;
+  monthly_reminder_day?: number | null;
 }
 
 // Query parameters for listing reminders
@@ -122,6 +126,7 @@ export interface ReminderConfigFormProps {
   config: ReminderConfig | null;
   onSubmit: (data: UpdateReminderConfigInput) => Promise<void>;
   isLoading?: boolean;
+  paymentSchedule?: string;
 }
 
 export interface ReminderConfigDialogProps {
@@ -129,6 +134,7 @@ export interface ReminderConfigDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
+  paymentSchedule?: string;
 }
 
 export interface ReminderSectionProps {
@@ -136,6 +142,7 @@ export interface ReminderSectionProps {
   loanDueDate: string;
   borrowerEmail: string | null;
   borrowerName: string;
+  paymentSchedule?: string;
 }
 
 export interface DeleteReminderDialogProps {

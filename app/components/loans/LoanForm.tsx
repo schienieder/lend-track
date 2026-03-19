@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loanFormSchema, type LoanFormData } from '@/schemas/loan';
@@ -19,6 +19,7 @@ import { Switch } from '@/components/ui/switch';
 import { CURRENCIES, type CurrencyCode } from '@/lib/utils';
 import type { Loan, PaymentSchedule, LoanStatus } from '@/types/loan';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { CalendarClock } from 'lucide-react';
 
 const paymentScheduleOptions = [
   { value: 'daily', label: 'Daily' },
@@ -42,16 +43,53 @@ const statusOptions = [
   { value: 'defaulted', label: 'Defaulted' },
 ];
 
-interface LoanFormProps {
-  loan?: Loan;
-  onSubmit: (data: LoanFormData) => Promise<void>;
-  isLoading?: boolean;
+function formatOrdinal(day: number): string {
+  if (day === 1 || day === 21 || day === 31) return `${day}st`;
+  if (day === 2 || day === 22) return `${day}nd`;
+  if (day === 3 || day === 23) return `${day}rd`;
+  return `${day}th`;
 }
 
-const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
+function getDayLabel(day: number): string {
+  if (day <= 28) return `${formatOrdinal(day)} of every month`;
+  if (day === 29) return `29th (last day in Feb)`;
+  if (day === 30) return `30th (last day in shorter months)`;
+  return `Last day of every month`;
+}
+
+/** Format the day for display (e.g. in badges/cards) */
+export function formatReminderDay(day: number): string {
+  if (day === 31) return 'Last day of month';
+  if (day === 30) return '30th (or last day)';
+  if (day === 29) return '29th (or last day)';
+  return formatOrdinal(day);
+}
+
+export interface MonthlyReminderConfig {
+  enabled: boolean;
+  day: number | null;
+}
+
+interface LoanFormProps {
+  loan?: Loan;
+  onSubmit: (data: LoanFormData, monthlyConfig?: MonthlyReminderConfig) => Promise<void>;
+  isLoading?: boolean;
+  initialMonthlyConfig?: MonthlyReminderConfig;
+}
+
+const dayOptions = Array.from({ length: 31 }, (_, i) => i + 1);
+
+const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading, initialMonthlyConfig }) => {
   const isEditing = !!loan;
   const { user } = useAuth();
   const defaultLenderName = user?.name || user?.email || '';
+
+  const [monthlyReminderEnabled, setMonthlyReminderEnabled] = useState(
+    initialMonthlyConfig?.enabled ?? false
+  );
+  const [monthlyReminderDay, setMonthlyReminderDay] = useState<number | null>(
+    initialMonthlyConfig?.day ?? null
+  );
 
   const {
     register,
@@ -98,9 +136,13 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
   const currency = watch('currency');
   const status = watch('status');
   const isFixedInterest = watch('is_fixed_interest');
+  const isMonthly = paymentSchedule === 'monthly';
 
   const handleFormSubmit = async (data: LoanFormData) => {
-    await onSubmit(data);
+    const monthlyConfig: MonthlyReminderConfig | undefined = isMonthly
+      ? { enabled: monthlyReminderEnabled, day: monthlyReminderDay }
+      : undefined;
+    await onSubmit(data, monthlyConfig);
   };
 
   return (
@@ -246,7 +288,13 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
           <Label htmlFor="payment_schedule">Payment Schedule *</Label>
           <Select
             value={paymentSchedule}
-            onValueChange={(value) => setValue('payment_schedule', value as PaymentSchedule)}
+            onValueChange={(value) => {
+              setValue('payment_schedule', value as PaymentSchedule);
+              if (value !== 'monthly') {
+                setMonthlyReminderEnabled(false);
+                setMonthlyReminderDay(null);
+              }
+            }}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select payment schedule" />
@@ -308,6 +356,57 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSubmit, isLoading }) => {
           )}
         </div>
       </div>
+
+      {isMonthly && (
+        <div className="rounded-lg border p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CalendarClock className="h-4 w-4 text-muted-foreground" />
+              <div className="space-y-0.5">
+                <Label htmlFor="monthly_reminder_toggle">Monthly Recurring Reminder</Label>
+                <p className="text-sm text-muted-foreground">
+                  Send a reminder email on a specific day every month
+                </p>
+              </div>
+            </div>
+            <Switch
+              id="monthly_reminder_toggle"
+              checked={monthlyReminderEnabled}
+              onCheckedChange={(checked) => {
+                setMonthlyReminderEnabled(checked);
+                if (!checked) {
+                  setMonthlyReminderDay(null);
+                }
+              }}
+            />
+          </div>
+
+          {monthlyReminderEnabled && (
+            <div className="space-y-2">
+              <Label>Reminder Day of Month</Label>
+              <Select
+                value={monthlyReminderDay?.toString() || ''}
+                onValueChange={(value) => setMonthlyReminderDay(parseInt(value))}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select day of month" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[200px]">
+                  <SelectItem value="31">Last day of every month</SelectItem>
+                  {dayOptions.filter((d) => d <= 30).map((day) => (
+                    <SelectItem key={day} value={day.toString()}>
+                      {getDayLabel(day)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Days 1-28 are available in every month. For days 29-31, the reminder will be sent on the last available day of shorter months (e.g., Feb 28th).
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="space-y-2">
         <Label htmlFor="notes">Notes</Label>

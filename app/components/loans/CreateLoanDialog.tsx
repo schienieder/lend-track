@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import LoanForm from '@/app/components/loans/LoanForm';
+import type { MonthlyReminderConfig } from '@/app/components/loans/LoanForm';
 import type { LoanFormData } from '@/schemas/loan';
 import type { CreateLoanDialogProps } from '@/types/loan';
 
@@ -20,7 +21,7 @@ const CreateLoanDialog: React.FC<CreateLoanDialogProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (data: LoanFormData) => {
+  const handleSubmit = async (data: LoanFormData, monthlyConfig?: MonthlyReminderConfig) => {
     setIsLoading(true);
     setError(null);
 
@@ -45,6 +46,19 @@ const CreateLoanDialog: React.FC<CreateLoanDialogProps> = ({
 
       if (!response.ok) {
         throw new Error(result.error || 'Failed to create loan');
+      }
+
+      // Save monthly reminder config if provided
+      if (monthlyConfig?.enabled && monthlyConfig.day && result.loan?.id) {
+        await fetch(`/api/loans/${result.loan.id}/reminders/config`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            enabled: true,
+            monthly_reminder_enabled: true,
+            monthly_reminder_day: monthlyConfig.day,
+          }),
+        });
       }
 
       onOpenChange(false);

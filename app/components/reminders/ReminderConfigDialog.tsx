@@ -16,6 +16,7 @@ const ReminderConfigDialog: React.FC<ReminderConfigDialogProps> = ({
   open,
   onOpenChange,
   onSuccess,
+  paymentSchedule,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -103,6 +104,7 @@ const ReminderConfigDialog: React.FC<ReminderConfigDialogProps> = ({
             config={config}
             onSubmit={handleSubmit}
             isLoading={isLoading}
+            paymentSchedule={paymentSchedule}
           />
         )}
       </DialogContent>

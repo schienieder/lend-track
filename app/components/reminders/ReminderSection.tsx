@@ -3,18 +3,33 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Settings, Bell, AlertCircle, Send } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Settings, Bell, AlertCircle, Send, CalendarClock } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import ReminderTable from '@/app/components/reminders/ReminderTable';
 import ReminderConfigDialog from '@/app/components/reminders/ReminderConfigDialog';
 import DeleteReminderDialog from '@/app/components/reminders/DeleteReminderDialog';
 import SendReminderDialog from '@/app/components/reminders/SendReminderDialog';
-import type { Reminder, ReminderSectionProps } from '@/types/reminder';
+import type { Reminder, ReminderConfig, ReminderSectionProps } from '@/types/reminder';
 
-const ReminderSection: React.FC<ReminderSectionProps> = ({ loanId, loanDueDate, borrowerEmail, borrowerName }) => {
+function formatReminderDay(day: number): string {
+  const ordinal = (d: number) => {
+    if (d === 1 || d === 21 || d === 31) return `${d}st`;
+    if (d === 2 || d === 22) return `${d}nd`;
+    if (d === 3 || d === 23) return `${d}rd`;
+    return `${d}th`;
+  };
+  if (day === 31) return 'last day of month';
+  if (day === 30) return '30th (or last day)';
+  if (day === 29) return '29th (or last day)';
+  return ordinal(day);
+}
+
+const ReminderSection: React.FC<ReminderSectionProps> = ({ loanId, loanDueDate, borrowerEmail, borrowerName, paymentSchedule }) => {
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reminderConfig, setReminderConfig] = useState<ReminderConfig | null>(null);
 
   // Dialog states
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
@@ -44,9 +59,22 @@ const ReminderSection: React.FC<ReminderSectionProps> = ({ loanId, loanDueDate, 
     }
   }, [loanId]);
 
+  const fetchConfig = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/loans/${loanId}/reminders/config`);
+      const result = await response.json();
+      if (response.ok && result.config) {
+        setReminderConfig(result.config);
+      }
+    } catch {
+      // Config fetch is non-critical
+    }
+  }, [loanId]);
+
   useEffect(() => {
     fetchReminders();
-  }, [fetchReminders]);
+    fetchConfig();
+  }, [fetchReminders, fetchConfig]);
 
   const handleDelete = (reminder: Reminder) => {
     setSelectedReminder(reminder);
@@ -75,6 +103,7 @@ const ReminderSection: React.FC<ReminderSectionProps> = ({ loanId, loanDueDate, 
 
   const handleSuccess = () => {
     fetchReminders();
+    fetchConfig();
   };
 
   // Calculate days until due
@@ -90,6 +119,8 @@ const ReminderSection: React.FC<ReminderSectionProps> = ({ loanId, loanDueDate, 
   const days = daysUntilDue();
   const pendingCount = reminders.filter(r => r.sent_status === 'pending').length;
   const sentCount = reminders.filter(r => r.sent_status === 'sent').length;
+  const isMonthly = paymentSchedule === 'monthly';
+  const hasMonthlyReminder = isMonthly && reminderConfig?.monthly_reminder_enabled && reminderConfig?.monthly_reminder_day;
 
   return (
     <div className="space-y-6">
@@ -102,6 +133,43 @@ const ReminderSection: React.FC<ReminderSectionProps> = ({ loanId, loanDueDate, 
             Update the loan with a borrower email to enable reminders.
           </AlertDescription>
         </Alert>
+      )}
+
+      {/* Monthly Reminder Status */}
+      {isMonthly && (
+        <Card>
+          <CardContent className="flex items-center justify-between py-4">
+            <div className="flex items-center gap-3">
+              <CalendarClock className="h-5 w-5 shrink-0 text-muted-foreground" />
+              <div>
+                <p className="font-medium">Monthly Recurring Reminder</p>
+                {hasMonthlyReminder ? (
+                  <p className="text-sm text-muted-foreground">
+                    Reminder sent on the <span className="font-medium text-foreground">{formatReminderDay(reminderConfig.monthly_reminder_day!)}</span> of every month
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    No monthly recurring reminder configured
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {hasMonthlyReminder ? (
+                <Badge variant="default">Active</Badge>
+              ) : (
+                <Badge variant="secondary">Not Set</Badge>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setConfigDialogOpen(true)}
+              >
+                {hasMonthlyReminder ? 'Edit' : 'Set Up'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Reminder Summary */}
@@ -192,6 +260,7 @@ const ReminderSection: React.FC<ReminderSectionProps> = ({ loanId, loanDueDate, 
         open={configDialogOpen}
         onOpenChange={setConfigDialogOpen}
         onSuccess={handleSuccess}
+        paymentSchedule={paymentSchedule}
       />
 
       <DeleteReminderDialog

@@ -59,10 +59,13 @@ export async function generateReminders(): Promise<ProcessResult> {
         interest_rate,
         due_date,
         status,
+        payment_schedule,
         reminder_configs (
           enabled,
           due_date_days_before,
-          overdue_days_after
+          overdue_days_after,
+          monthly_reminder_enabled,
+          monthly_reminder_day
         )
       `)
       .in('status', ['active', 'overdue']);
@@ -85,6 +88,8 @@ export async function generateReminders(): Promise<ProcessResult> {
         enabled: true,
         due_date_days_before: [7, 3, 1, 0],
         overdue_days_after: [1, 7, 14],
+        monthly_reminder_enabled: false,
+        monthly_reminder_day: null,
       };
 
       if (!config.enabled) {
@@ -158,6 +163,54 @@ export async function generateReminders(): Promise<ProcessResult> {
 
               if (insertError) {
                 result.errors.push(`Failed to create overdue reminder for loan ${loan.id}: ${insertError.message}`);
+              }
+            }
+          }
+        }
+      }
+
+      // Check for monthly recurring reminders
+      const loanPaymentSchedule = (loan as Record<string, unknown>).payment_schedule as string | undefined;
+      if (
+        loanPaymentSchedule === 'monthly' &&
+        config.monthly_reminder_enabled &&
+        config.monthly_reminder_day
+      ) {
+        // Only generate monthly reminders up to the due date
+        const dueDate = new Date(loan.due_date);
+        dueDate.setHours(0, 0, 0, 0);
+
+        if (today <= dueDate) {
+          const todayDayOfMonth = today.getDate();
+
+          // Handle months with fewer days (e.g., day 31 in a 30-day month → trigger on last day)
+          const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+          const effectiveDay = Math.min(config.monthly_reminder_day, lastDayOfMonth);
+
+          if (todayDayOfMonth === effectiveDay) {
+            const reminderDate = todayStr;
+
+            // Check if a monthly reminder already exists for this date
+            const { data: existingReminder } = await supabase
+              .from('reminders')
+              .select('id')
+              .eq('loan_id', loan.id)
+              .eq('reminder_type', 'due_date')
+              .eq('reminder_date', reminderDate)
+              .single();
+
+            if (!existingReminder) {
+              const { error: insertError } = await supabase
+                .from('reminders')
+                .insert({
+                  loan_id: loan.id,
+                  reminder_type: 'due_date',
+                  reminder_date: reminderDate,
+                  sent_status: 'pending',
+                });
+
+              if (insertError) {
+                result.errors.push(`Failed to create monthly reminder for loan ${loan.id}: ${insertError.message}`);
               }
             }
           }

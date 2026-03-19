@@ -31,6 +31,8 @@ export const updateReminderConfigSchema = z.object({
     .min(0)
     .max(10)
     .optional(),
+  monthly_reminder_enabled: z.boolean().optional(),
+  monthly_reminder_day: z.number().int().min(1).max(31).nullable().optional(),
 });
 
 // Schema for query parameters when listing reminders
@@ -72,6 +74,8 @@ export const reminderConfigFormSchema = z.object({
     .array(z.number().int().min(0).max(365))
     .min(0)
     .max(10),
+  monthly_reminder_enabled: z.boolean(),
+  monthly_reminder_day: z.number().int().min(1).max(31).nullable(),
 });
 
 // Type inference from schemas

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import LoanForm from '@/app/components/loans/LoanForm';
+import type { MonthlyReminderConfig } from '@/app/components/loans/LoanForm';
 import type { LoanFormData } from '@/schemas/loan';
 import type { EditLoanDialogProps } from '@/types/loan';
 
@@ -20,8 +21,33 @@ const EditLoanDialog: React.FC<EditLoanDialogProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [initialMonthlyConfig, setInitialMonthlyConfig] = useState<MonthlyReminderConfig | undefined>(undefined);
+  const [configFetched, setConfigFetched] = useState(false);
 
-  const handleSubmit = async (data: LoanFormData) => {
+  useEffect(() => {
+    if (open && loan && loan.payment_schedule === 'monthly') {
+      setConfigFetched(false);
+      fetch(`/api/loans/${loan.id}/reminders/config`)
+        .then((res) => res.json())
+        .then((result) => {
+          if (result.config) {
+            setInitialMonthlyConfig({
+              enabled: result.config.monthly_reminder_enabled ?? false,
+              day: result.config.monthly_reminder_day ?? null,
+            });
+          }
+          setConfigFetched(true);
+        })
+        .catch(() => {
+          setConfigFetched(true);
+        });
+    } else if (open) {
+      setInitialMonthlyConfig(undefined);
+      setConfigFetched(true);
+    }
+  }, [open, loan]);
+
+  const handleSubmit = async (data: LoanFormData, monthlyConfig?: MonthlyReminderConfig) => {
     if (!loan) return;
 
     setIsLoading(true);
@@ -50,6 +76,18 @@ const EditLoanDialog: React.FC<EditLoanDialogProps> = ({
         throw new Error(result.error || 'Failed to update loan');
       }
 
+      // Save monthly reminder config
+      if (data.payment_schedule === 'monthly') {
+        await fetch(`/api/loans/${loan.id}/reminders/config`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            monthly_reminder_enabled: monthlyConfig?.enabled ?? false,
+            monthly_reminder_day: monthlyConfig?.day ?? null,
+          }),
+        });
+      }
+
       onOpenChange(false);
       onSuccess?.();
     } catch (err: unknown) {
@@ -61,6 +99,9 @@ const EditLoanDialog: React.FC<EditLoanDialogProps> = ({
   };
 
   if (!loan) return null;
+
+  const isMonthly = loan.payment_schedule === 'monthly';
+  const showForm = !isMonthly || configFetched;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -78,7 +119,18 @@ const EditLoanDialog: React.FC<EditLoanDialogProps> = ({
           </div>
         )}
 
-        <LoanForm loan={loan} onSubmit={handleSubmit} isLoading={isLoading} />
+        {showForm ? (
+          <LoanForm
+            loan={loan}
+            onSubmit={handleSubmit}
+            isLoading={isLoading}
+            initialMonthlyConfig={initialMonthlyConfig}
+          />
+        ) : (
+          <div className="flex items-center justify-center py-8">
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(tsx|ts\\)$\")",
+      "Bash(ls:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx next:*)"
+    ]
+  }
+}

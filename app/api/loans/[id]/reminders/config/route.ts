@@ -47,6 +47,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           enabled: true,
           due_date_days_before: [7, 3, 1],
           overdue_days_after: [1, 7, 14],
+          monthly_reminder_enabled: false,
+          monthly_reminder_day: null,
           created_at: null,
           updated_at: null,
         },

@@ -144,6 +144,7 @@ const LoanDetailPageView: React.FC<LoanDetailPageViewProps> = ({ loanId }) => {
             loanDueDate={loan.due_date}
             borrowerEmail={loan.borrower_email}
             borrowerName={loan.borrower_name}
+            paymentSchedule={loan.payment_schedule}
           />
         </div>
 

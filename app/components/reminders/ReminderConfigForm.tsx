@@ -9,13 +9,34 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { X, Plus } from 'lucide-react';
 import type { ReminderConfig, ReminderConfigFormProps } from '@/types/reminder';
+
+function formatDayLabel(day: number): string {
+  const ordinal = (d: number) => {
+    if (d === 1 || d === 21 || d === 31) return `${d}st`;
+    if (d === 2 || d === 22) return `${d}nd`;
+    if (d === 3 || d === 23) return `${d}rd`;
+    return `${d}th`;
+  };
+  if (day <= 28) return ordinal(day);
+  if (day === 29) return '29th (last day in Feb)';
+  if (day === 30) return '30th (last day in shorter months)';
+  return 'Last day of every month';
+}
 
 const ReminderConfigForm: React.FC<ReminderConfigFormProps> = ({
   config,
   onSubmit,
   isLoading,
+  paymentSchedule,
 }) => {
   const [dueDateDays, setDueDateDays] = useState<number[]>(
     config?.due_date_days_before || [7, 3, 1]
@@ -25,6 +46,8 @@ const ReminderConfigForm: React.FC<ReminderConfigFormProps> = ({
   );
   const [newDueDateDay, setNewDueDateDay] = useState<string>('');
   const [newOverdueDay, setNewOverdueDay] = useState<string>('');
+
+  const isMonthly = paymentSchedule === 'monthly';
 
   const {
     register,
@@ -38,10 +61,14 @@ const ReminderConfigForm: React.FC<ReminderConfigFormProps> = ({
       enabled: config?.enabled ?? true,
       due_date_days_before: config?.due_date_days_before || [7, 3, 1],
       overdue_days_after: config?.overdue_days_after || [1, 7, 14],
+      monthly_reminder_enabled: config?.monthly_reminder_enabled ?? false,
+      monthly_reminder_day: config?.monthly_reminder_day ?? null,
     },
   });
 
   const enabled = watch('enabled');
+  const monthlyReminderEnabled = watch('monthly_reminder_enabled');
+  const monthlyReminderDay = watch('monthly_reminder_day');
 
   const handleAddDueDateDay = () => {
     const day = parseInt(newDueDateDay);
@@ -80,8 +107,12 @@ const ReminderConfigForm: React.FC<ReminderConfigFormProps> = ({
       enabled: data.enabled,
       due_date_days_before: dueDateDays,
       overdue_days_after: overdueDays,
+      monthly_reminder_enabled: data.monthly_reminder_enabled,
+      monthly_reminder_day: data.monthly_reminder_day,
     });
   };
+
+  const dayOptions = Array.from({ length: 31 }, (_, i) => i + 1);
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit(handleFormSubmit)}>
@@ -101,6 +132,54 @@ const ReminderConfigForm: React.FC<ReminderConfigFormProps> = ({
 
       {enabled && (
         <>
+          {isMonthly && (
+            <div className="space-y-3 rounded-lg border p-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="monthly_reminder_enabled">Monthly Recurring Reminder</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Send a reminder on a specific day every month
+                  </p>
+                </div>
+                <Switch
+                  id="monthly_reminder_enabled"
+                  checked={monthlyReminderEnabled}
+                  onCheckedChange={(checked: boolean) => {
+                    setValue('monthly_reminder_enabled', checked);
+                    if (!checked) {
+                      setValue('monthly_reminder_day', null);
+                    }
+                  }}
+                />
+              </div>
+
+              {monthlyReminderEnabled && (
+                <div className="space-y-2">
+                  <Label>Day of Month</Label>
+                  <Select
+                    value={monthlyReminderDay?.toString() || ''}
+                    onValueChange={(value) => setValue('monthly_reminder_day', parseInt(value))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select day of month" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[200px]">
+                      <SelectItem value="31">Last day of every month</SelectItem>
+                      {dayOptions.filter((d) => d <= 30).map((day) => (
+                        <SelectItem key={day} value={day.toString()}>
+                          {formatDayLabel(day)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Days 1-28 are available in every month. For days 29-31, the reminder will be sent on the last available day of shorter months (e.g., Feb 28th).
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="space-y-3">
             <div>
               <Label>Days Before Due Date</Label>
