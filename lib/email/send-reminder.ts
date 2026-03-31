@@ -24,6 +24,7 @@ export interface SendReminderParams {
   daysOverdue?: number;
   customMessage?: string;
   paymentSchedule?: string;
+  isMonthlyPayment?: boolean;
 }
 
 export interface SendReminderResult {
@@ -48,6 +49,7 @@ export async function sendReminder(params: SendReminderParams): Promise<SendRemi
     daysOverdue,
     customMessage,
     paymentSchedule,
+    isMonthlyPayment = false,
   } = params;
 
   // Calculate total amount with interest
@@ -68,6 +70,7 @@ export async function sendReminder(params: SendReminderParams): Promise<SendRemi
     currency,
     daysUntilDue,
     daysOverdue,
+    isMonthlyPayment,
   };
 
   // Get the appropriate template based on reminder type

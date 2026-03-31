@@ -18,10 +18,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Fetch the loan with user details
+    // Fetch the loan with user details and reminder config
     const { data: loan, error: loanError } = await supabase
       .from('loans')
-      .select('id, borrower_name, borrower_email, lender_name, principal_amount, interest_rate, is_fixed_interest, fixed_interest_amount, currency, due_date, status, user_id')
+      .select('id, borrower_name, borrower_email, lender_name, principal_amount, interest_rate, is_fixed_interest, fixed_interest_amount, currency, due_date, status, user_id, payment_schedule, reminder_configs(monthly_reminder_enabled)')
       .eq('id', loanId)
       .eq('user_id', user.id)
       .single();
@@ -73,6 +73,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const daysUntilDue = days >= 0 ? days : undefined;
     const daysOverdue = days < 0 ? daysSince(loan.due_date) : undefined;
 
+    // Detect if this is a monthly payment loan with monthly reminders enabled
+    const reminderConfigArray = (loan as Record<string, unknown>).reminder_configs as Array<{ monthly_reminder_enabled: boolean }> | null;
+    const isMonthlyPayment = (loan as Record<string, unknown>).payment_schedule === 'monthly'
+      && reminderConfigArray?.[0]?.monthly_reminder_enabled === true
+      && days > 0;
+
     // Send the reminder
     const sendResult = await sendReminder({
       reminderType: reminder.reminder_type,
@@ -87,6 +93,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       currency: loan.currency,
       daysUntilDue,
       daysOverdue,
+      isMonthlyPayment,
     });
 
     // Update reminder status
