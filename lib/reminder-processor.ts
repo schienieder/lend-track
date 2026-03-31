@@ -234,7 +234,7 @@ export async function processReminders(): Promise<ProcessResult> {
   const result: ProcessResult = { processed: 0, sent: 0, failed: 0, errors: [] };
 
   try {
-    // Get all pending reminders with loan and user details (including payment_schedule and reminder config)
+    // Get all pending reminders with loan and user details
     const { data: reminders, error: remindersError } = await supabase
       .from('reminders')
       .select(`
@@ -255,10 +255,7 @@ export async function processReminders(): Promise<ProcessResult> {
           due_date,
           status,
           user_id,
-          payment_schedule,
-          reminder_configs (
-            monthly_reminder_enabled
-          )
+          payment_schedule
         )
       `)
       .eq('sent_status', 'pending')
@@ -307,11 +304,17 @@ export async function processReminders(): Promise<ProcessResult> {
       const daysOverdue = days < 0 ? daysSince(loan.due_date) : undefined;
 
       // Detect if this is a monthly payment loan with monthly reminders enabled
+      let isMonthlyPayment = false;
       const loanRecord = loan as unknown as Record<string, unknown>;
-      const loanReminderConfigs = loanRecord.reminder_configs as Array<{ monthly_reminder_enabled: boolean }> | null;
-      const isMonthlyPayment = loanRecord.payment_schedule === 'monthly'
-        && loanReminderConfigs?.[0]?.monthly_reminder_enabled === true
-        && days > 0;
+      if (loanRecord.payment_schedule === 'monthly' && days > 0) {
+        const { data: reminderConfig } = await supabase
+          .from('reminder_configs')
+          .select('monthly_reminder_enabled')
+          .eq('loan_id', loan.id)
+          .single();
+
+        isMonthlyPayment = reminderConfig?.monthly_reminder_enabled === true;
+      }
 
       // Send the reminder
       const sendResult = await sendReminder({

@@ -18,10 +18,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Fetch the loan with user details and reminder config
+    // Fetch the loan with user details
     const { data: loan, error: loanError } = await supabase
       .from('loans')
-      .select('id, borrower_name, borrower_email, lender_name, principal_amount, interest_rate, is_fixed_interest, fixed_interest_amount, currency, due_date, status, user_id, payment_schedule, reminder_configs(monthly_reminder_enabled)')
+      .select('id, borrower_name, borrower_email, lender_name, principal_amount, interest_rate, is_fixed_interest, fixed_interest_amount, currency, due_date, status, user_id, payment_schedule')
       .eq('id', loanId)
       .eq('user_id', user.id)
       .single();
@@ -45,10 +45,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const daysOverdue = days < 0 ? daysSince(loan.due_date) : undefined;
 
     // Detect if this is a monthly payment loan with monthly reminders enabled
-    const reminderConfigArray = (loan as Record<string, unknown>).reminder_configs as Array<{ monthly_reminder_enabled: boolean }> | null;
-    const isMonthlyPayment = (loan as Record<string, unknown>).payment_schedule === 'monthly'
-      && reminderConfigArray?.[0]?.monthly_reminder_enabled === true
-      && days > 0; // Only for monthly context when final due date is still in the future
+    let isMonthlyPayment = false;
+    if ((loan as Record<string, unknown>).payment_schedule === 'monthly' && days > 0) {
+      const { data: reminderConfig } = await supabase
+        .from('reminder_configs')
+        .select('monthly_reminder_enabled')
+        .eq('loan_id', loanId)
+        .single();
+
+      isMonthlyPayment = reminderConfig?.monthly_reminder_enabled === true;
+    }
 
     // Create reminder record first
     const todayStr = new Date().toISOString().split('T')[0];
